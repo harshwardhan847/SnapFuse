@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { ThemeProvider } from "./theme-provider";
+import { Toaster } from "../ui/sonner";
 
 type Props = {
   children: ReactNode;
@@ -14,6 +15,7 @@ const RootProvider = ({ children }: Props) => {
       disableTransitionOnChange={true}
     >
       {children}
+      <Toaster richColors />
     </ThemeProvider>
   );
 };
