@@ -1,3 +1,4 @@
+import { mainModel } from "@/ai/models";
 import { seoContentSchema } from "@/ai/schema";
 import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
     const { name, description } = parseResult.data;
 
     const result = await generateObject({
-      model: google("gemini-2.5-flash"),
+      model: mainModel,
       prompt: `
 You are an expert e-commerce SEO copywriter.
 
