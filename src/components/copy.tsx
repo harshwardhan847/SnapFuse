@@ -13,13 +13,16 @@ const CopyText = ({ text }: Props) => {
     <Button
       size={"icon"}
       variant={"outline"}
+      className="cursor-pointer w-min aspect-square"
       onClick={() =>
         window.navigator?.clipboard
           ?.writeText(text)
           .then(() => toast.success("Copied to clipboard!"))
       }
     >
-      <Copy />
+      <div>
+        <Copy />
+      </div>
     </Button>
   );
 };

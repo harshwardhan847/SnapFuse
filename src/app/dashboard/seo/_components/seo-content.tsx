@@ -53,13 +53,17 @@ const SeoContent = ({
           <Label>
             Title <CopyText text={title} />
           </Label>
-          <Input defaultValue={title} />
+          <Input defaultValue={title} className="" />
         </FormItem>
         <FormItem>
           <Label>
             Description <CopyText text={description} />
           </Label>
-          <Textarea cols={2} className="" defaultValue={description} />
+          <Textarea
+            cols={2}
+            className="max-h-[200px]"
+            defaultValue={description}
+          />
         </FormItem>
       </CardContent>
       <CardFooter>

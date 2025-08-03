@@ -74,6 +74,7 @@ export function SeoForm() {
               <FormControl>
                 <Textarea
                   rows={24}
+                  className="min-h-[200px]"
                   placeholder="description of product"
                   {...field}
                 />
