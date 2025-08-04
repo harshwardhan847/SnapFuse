@@ -132,16 +132,17 @@ export default function AnimatedAIChatInput({
   disabled,
   setValue,
   hasMessages,
+  isTyping,
 }: {
   onSubmit: () => void;
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
   disabled: boolean;
   hasMessages: boolean;
+  isTyping: boolean;
 }) {
   // const [value, setValue] = useState("");
   const [attachments, setAttachments] = useState<string[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [activeSuggestion, setActiveSuggestion] = useState<number>(-1);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
@@ -267,9 +268,8 @@ export default function AnimatedAIChatInput({
   const handleSendMessage = async () => {
     if (value.trim()) {
       startTransition(() => {
-        setIsTyping(true);
         onSubmit();
-        setIsTyping(false);
+
         adjustHeight(true);
       });
     }
@@ -296,18 +296,38 @@ export default function AnimatedAIChatInput({
   return (
     <div
       className={cn(
-        "flex w-full overflow-x-hidden mb-2",
-        hasMessages && "absolute bottom-0"
+        "flex w-full  mb-2 transition ease-in-out",
+        hasMessages ? "absolute bottom-0" : "h-screen overflow-x-hidden"
       )}
     >
       <div
         className={cn(
           "text-foreground w-full",
           hasMessages
-            ? ""
+            ? "relative"
             : "relative flex min-h-full w-full flex-col items-center justify-center overflow-hidden bg-transparent p-6"
         )}
       >
+        <AnimatePresence>
+          {isTyping && (
+            <motion.div
+              className="border-border bg-background/80 absolute bottom-48 left-1/2 mx-auto -translate-x-1/2 transform rounded-full border px-4 py-2 shadow-lg backdrop-blur-2xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 flex h-7 w-8 items-center justify-center rounded-full text-center">
+                  <Sparkles className="text-primary h-4 w-4" />
+                </div>
+                <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <span>Thinking</span>
+                  <TypingDots />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <div className="absolute inset-0 h-full w-full overflow-hidden">
           <div className="bg-primary/10 absolute top-0 left-1/4 h-96 w-96 animate-pulse rounded-full mix-blend-normal blur-[128px] filter" />
           <div className="bg-secondary/10 absolute right-1/4 bottom-0 h-96 w-96 animate-pulse rounded-full mix-blend-normal blur-[128px] filter delay-700" />
@@ -406,7 +426,7 @@ export default function AnimatedAIChatInput({
                   onKeyDown={handleKeyDown}
                   onFocus={() => setInputFocused(true)}
                   onBlur={() => setInputFocused(false)}
-                  placeholder="Ask mvp.ai a question..."
+                  placeholder="Ask a question..."
                   containerClassName="w-full"
                   className={cn(
                     "w-full px-4 py-3",
@@ -549,27 +569,6 @@ export default function AnimatedAIChatInput({
           </motion.div>
         </div>
 
-        <AnimatePresence>
-          {isTyping && (
-            <motion.div
-              className="border-border bg-background/80 fixed bottom-8 mx-auto -translate-x-1/2 transform rounded-full border px-4 py-2 shadow-lg backdrop-blur-2xl"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-            >
-              <div className="flex items-center gap-3">
-                <div className="bg-primary/10 flex h-7 w-8 items-center justify-center rounded-full text-center">
-                  <Sparkles className="text-primary h-4 w-4" />
-                </div>
-                <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                  <span>Thinking</span>
-                  <TypingDots />
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {inputFocused && (
           <motion.div
             className="from-primary via-primary/80 to-secondary pointer-events-none fixed z-0 h-[50rem] w-[50rem] rounded-full bg-gradient-to-r opacity-[0.02] blur-[96px]"
@@ -590,7 +589,7 @@ export default function AnimatedAIChatInput({
   );
 }
 
-function TypingDots() {
+export function TypingDots() {
   return (
     <div className="ml-1 flex items-center">
       {[1, 2, 3].map((dot) => (

@@ -1,12 +1,15 @@
 "use client";
 
-import AnimatedAIChatInput from "@/components/mvpblocks/animated-ai-chat";
+import AnimatedAIChatInput, {
+  TypingDots,
+} from "@/components/mvpblocks/animated-ai-chat";
 import { cn } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { Loader } from "lucide-react";
+import { Loader, Sparkles } from "lucide-react";
 import { useState } from "react";
 import MessagesList from "./_components/messages";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Page() {
   const { messages, sendMessage, status, stop } = useChat({
@@ -20,7 +23,7 @@ export default function Page() {
   return (
     <div
       className={cn(
-        "flex-1 max-h-[calc(100vh-4rem)] overflow-auto h-full flex items-center flex-col",
+        "flex-1 min-h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] overflow-auto h-full flex items-center flex-col",
         hasMessages ? "justify-between" : "justify-center"
       )}
     >
@@ -28,7 +31,6 @@ export default function Page() {
 
       {(status === "submitted" || status === "streaming") && (
         <div>
-          {status === "submitted" && <Loader className="animate-spin" />}
           <button type="button" onClick={() => stop()}>
             Stop
           </button>
@@ -46,6 +48,7 @@ export default function Page() {
         }}
         value={input}
         disabled={status !== "ready"}
+        isTyping={status === "submitted"}
       />
     </div>
   );
