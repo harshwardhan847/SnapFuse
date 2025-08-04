@@ -23,7 +23,7 @@ export default function Page() {
   return (
     <div
       className={cn(
-        "flex-1 min-h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] overflow-auto h-full flex items-center flex-col",
+        "flex-1 min-h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] overflow-x-auto h-full flex items-center flex-col",
         hasMessages ? "justify-between" : "justify-center"
       )}
     >

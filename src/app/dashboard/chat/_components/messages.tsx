@@ -16,7 +16,7 @@ const MessagesList = ({ messages }: Props) => {
   }, [messages]);
   return (
     <>
-      <div className="w-full h-full flex-1 flex flex-col pt-4 pb-64 px-8 min-h-screen max-h-screen overflow-auto">
+      <div className="w-full h-full flex-1 flex flex-col pt-4 pb-64 px-8 min-h-auto max-h-screen overflow-auto">
         {messages?.map((message) => (
           <div
             key={message.id}
@@ -41,8 +41,8 @@ const MessagesList = ({ messages }: Props) => {
             </div>
           </div>
         ))}
+        <div ref={messageEndRef} />
       </div>
-      <div ref={messageEndRef} />
     </>
   );
 };
