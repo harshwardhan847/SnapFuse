@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { seoContentSchema } from "@/ai/schema";
 import { SetStateAction } from "react";
 import { toast } from "sonner";
-import { seoFormSchema } from "@/app/api/seo/route";
+import { seoFormSchema } from "@/schema";
 
 export function SeoForm({
   setResults,

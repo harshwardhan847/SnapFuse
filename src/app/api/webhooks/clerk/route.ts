@@ -1,54 +1,62 @@
-import { httpRouter } from "convex/server";
+import { Webhook } from "svix";
+import { NextRequest, NextResponse } from "next/server";
 
 import type { WebhookEvent } from "@clerk/backend";
-import { Webhook } from "svix";
-import { httpAction } from "../../../../../convex/_generated/server";
-import { internal } from "../../../../../convex/_generated/api";
+import { ConvexHttpClient } from "convex/browser";
+import { api, internal } from "../../../../../convex/_generated/api";
 
-const http = httpRouter();
-
-http.route({
-  path: "/clerk-users-webhook",
-  method: "POST",
-  handler: httpAction(async (ctx, request) => {
-    const event = await validateRequest(request);
-    if (!event) return new Response("Error occured", { status: 400 });
-
-    switch (event.type) {
-      case "user.created":
-      case "user.updated":
-        await ctx.runMutation(internal.users.upsertFromClerk, {
-          data: event.data,
-        });
-        break;
-      case "user.deleted":
-        if (!event.data?.id) return new Response(null, { status: 500 });
-        await ctx.runMutation(internal.users.deleteFromClerk, {
-          clerkUserId: event.data.id,
-        });
-        break;
-      default:
-        // Ignore unhandled events.
-        break;
-    }
-    return new Response(null, { status: 200 });
-  }),
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!, {
+  auth: process.env.CONVEX_API_KEY!, // your Convex API key or auth
 });
+const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET!;
+const webhook = new Webhook(WEBHOOK_SECRET);
 
-async function validateRequest(req: Request): Promise<WebhookEvent | null> {
-  const payloadString = await req.text();
-  const svixHeaders = {
-    "svix-id": req.headers.get("svix-id")!,
-    "svix-timestamp": req.headers.get("svix-timestamp")!,
-    "svix-signature": req.headers.get("svix-signature")!,
-  };
-  const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET!);
-  try {
-    return wh.verify(payloadString, svixHeaders) as unknown as WebhookEvent;
-  } catch (error) {
-    console.error("Error verifying webhook event", error);
-    return null;
+export async function POST(req: NextRequest) {
+  const svix_id = req.headers.get("svix-id");
+  const svix_timestamp = req.headers.get("svix-timestamp");
+  const svix_signature = req.headers.get("svix-signature");
+
+  if (!svix_id || !svix_timestamp || !svix_signature) {
+    return NextResponse.json(
+      { error: "Missing Svix headers" },
+      { status: 400 }
+    );
   }
-}
 
-export default http;
+  const payloadString = await req.text();
+
+  let event: WebhookEvent;
+  try {
+    event = webhook.verify(payloadString, {
+      "svix-id": svix_id,
+      "svix-timestamp": svix_timestamp,
+      "svix-signature": svix_signature,
+    }) as WebhookEvent;
+  } catch (error) {
+    console.error("Webhook verification failed", error);
+    return NextResponse.json(
+      { error: "Invalid webhook signature" },
+      { status: 400 }
+    );
+  }
+
+  switch (event.type) {
+    case "user.created":
+    case "user.updated":
+      await convex.mutation(api.users.upsertFromClerk, {
+        data: event.data,
+      });
+      break;
+    case "user.deleted":
+      if (!event.data.id) return new Response(null, { status: 500 });
+      await convex.mutation(api.users.deleteFromClerk, {
+        clerkUserId: event.data.id,
+      });
+      break;
+    default:
+      // unhandled event, ignore
+      break;
+  }
+
+  return NextResponse.json(null, { status: 200 });
+}

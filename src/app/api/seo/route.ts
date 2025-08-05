@@ -1,24 +1,9 @@
 import { mainModel } from "@/ai/models";
 import { seoContentSchema } from "@/ai/schema";
+import { seoFormSchema } from "@/schema";
 import { generateObject } from "ai";
-import z from "zod";
 
 export const maxDuration = 30;
-
-// Enhanced schema validation with better error handling
-export const seoFormSchema = z.object({
-  name: z.string().min(2, {
-    error: "Product name must be at least 2 characters.",
-  }),
-  description: z
-    .string()
-    .min(100, {
-      error: "Description must be at least 100 characters.",
-    })
-    .max(3000, {
-      error: "Description cannot exceed 3,000 characters.",
-    }),
-});
 
 export async function POST(req: Request) {
   try {

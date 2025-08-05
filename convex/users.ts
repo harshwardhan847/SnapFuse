@@ -1,7 +1,7 @@
-import { internalMutation } from "./_generated/server";
-import { v, Validator } from "convex/values";
+import { internalMutation, mutation } from "./_generated/server";
+import { v } from "convex/values";
 
-export const upsertFromClerk = internalMutation({
+export const upsertFromClerk = mutation({
   args: { data: v.any() }, // Trust Clerk, skip runtime validation for shape
   handler: async (ctx, { data }) => {
     const userAttributes = {
@@ -25,7 +25,7 @@ export const upsertFromClerk = internalMutation({
   },
 });
 
-export const deleteFromClerk = internalMutation({
+export const deleteFromClerk = mutation({
   args: { clerkUserId: v.string() },
   handler: async (ctx, { clerkUserId }) => {
     const user = await ctx.db
