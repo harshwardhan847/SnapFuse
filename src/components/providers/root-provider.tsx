@@ -1,6 +1,8 @@
 import React, { ReactNode } from "react";
 import { ThemeProvider } from "./theme-provider";
 import { Toaster } from "../ui/sonner";
+import { ClerkProvider } from "@clerk/nextjs";
+import ConvexClientProvider from "./convex-client-provider";
 
 type Props = {
   children: ReactNode;
@@ -8,15 +10,19 @@ type Props = {
 
 const RootProvider = ({ children }: Props) => {
   return (
-    <ThemeProvider
-      attribute="class" // or "data-theme" if using [data-theme=dark]
-      defaultTheme="system"
-      enableSystem={true}
-      disableTransitionOnChange={true}
-    >
-      {children}
-      <Toaster richColors />
-    </ThemeProvider>
+    <ClerkProvider>
+      <ConvexClientProvider>
+        <ThemeProvider
+          attribute="class" // or "data-theme" if using [data-theme=dark]
+          defaultTheme="system"
+          enableSystem={true}
+          disableTransitionOnChange={true}
+        >
+          {children}
+          <Toaster richColors />
+        </ThemeProvider>
+      </ConvexClientProvider>
+    </ClerkProvider>
   );
 };
 

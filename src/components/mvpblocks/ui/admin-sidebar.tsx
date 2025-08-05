@@ -28,6 +28,16 @@ import {
   MessagesSquare,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import {
+  SignInButton,
+  useAuth,
+  useClerk,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useConvexAuth } from "convex/react";
 
 const menuItems = [
   { title: "Home", icon: LayoutDashboard, href: "/dashboard/home" },
@@ -45,6 +55,11 @@ export const AdminSidebar = memo(() => {
   const isActive = (href: string): boolean => {
     return pathname.includes(href);
   };
+  const { isSignedIn, isLoaded } = useAuth();
+  const { isAuthenticated } = useConvexAuth();
+  const { openUserProfile } = useClerk();
+  const { user } = useUser();
+  console.log(isAuthenticated);
 
   return (
     <Sidebar collapsible="icon">
@@ -99,14 +114,30 @@ export const AdminSidebar = memo(() => {
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="#profile">
-                <User />
-                <span>Profile</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {isLoaded ? (
+            <SidebarMenuItem>
+              {isSignedIn ? (
+                <div className="flex items-center justify-start gap-2">
+                  <UserButton />
+                  <button
+                    onClick={() => openUserProfile()}
+                    className="flex gap-0 items-start justify-center flex-col text-sm"
+                  >
+                    <span className="font-semibold">{user?.fullName}</span>
+                    <span className="text-xs">
+                      {user?.emailAddresses?.[0]?.emailAddress}
+                    </span>
+                  </button>
+                </div>
+              ) : (
+                <Button asChild className="w-full">
+                  <SignInButton />
+                </Button>
+              )}
+            </SidebarMenuItem>
+          ) : (
+            <Skeleton className="h-8 w-full" />
+          )}
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
