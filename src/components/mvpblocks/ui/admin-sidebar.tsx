@@ -41,7 +41,7 @@ import { useConvexAuth } from "convex/react";
 
 const menuItems = [
   { title: "Home", icon: LayoutDashboard, href: "/dashboard/home" },
-  { title: "Chat", icon: MessagesSquare, href: "/dashboard/chat" },
+  { title: "Chats", icon: MessagesSquare, href: "/dashboard/chat" },
 
   { title: "SEO", icon: Activity, href: "/dashboard/seo" },
   { title: "Images", icon: Images, href: "/dashboard/image" },
