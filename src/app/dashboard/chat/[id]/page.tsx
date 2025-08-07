@@ -1,55 +1,36 @@
 "use client";
 
-import AnimatedAIChatInput, {
-  TypingDots,
-} from "@/components/mvpblocks/animated-ai-chat";
-import { cn } from "@/lib/utils";
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
-import { Loader, Sparkles } from "lucide-react";
-import { useState } from "react";
-import MessagesList from "./_components/messages";
-import { AnimatePresence, motion } from "framer-motion";
+import { useParams } from "next/navigation";
+import Chat from "./_components/chat";
+import { useQuery } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
+import { UIDataTypes, UIMessage, UITools } from "ai";
+import { Loader } from "lucide-react";
 
 export default function Page() {
-  const { messages, sendMessage, status, stop } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/chat",
-    }),
+  const params: { id: string } = useParams();
+  const initialMessages = useQuery(api.messages.getMessages, {
+    sessionId: params?.id,
   });
-  const hasMessages = false || messages.length > 0;
-  const [input, setInput] = useState("");
+
+  if (!initialMessages) {
+    return (
+      <div className="flex items-center justify-center w-full h-full flex-1 min-h-screen">
+        <Loader className="animate-spin" size={25} />
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={cn(
-        "flex-1 min-h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] overflow-x-auto h-full flex items-center flex-col",
-        hasMessages ? "justify-between" : "justify-center"
-      )}
-    >
-      {hasMessages && <MessagesList messages={messages} />}
-
-      {(status === "submitted" || status === "streaming") && (
-        <div>
-          <button type="button" onClick={() => stop()}>
-            Stop
-          </button>
-        </div>
-      )}
-
-      <AnimatedAIChatInput
-        hasMessages={hasMessages}
-        setValue={setInput}
-        onSubmit={() => {
-          if (input.trim()) {
-            sendMessage({ text: input });
-            setInput("");
-          }
-        }}
-        value={input}
-        disabled={status !== "ready"}
-        isTyping={status === "submitted"}
-      />
-    </div>
+    <Chat
+      chatId={params.id}
+      initialMessages={
+        initialMessages?.map((message) => message.message) as UIMessage<
+          unknown,
+          UIDataTypes,
+          UITools
+        >[]
+      }
+    />
   );
 }

@@ -70,12 +70,12 @@ export function CreateChatModal() {
   }
 
   return (
-    <div className="flex items-center justify-center cursor-pointer rounded-2xl bg-card border-border border w-full max-w-36 aspect-square hover:ring-primary hover:ring-2 transition">
+    <div className="flex items-center justify-center cursor-pointer rounded-2xl bg-card min-h-32 border-border border w-full hover:ring-primary hover:ring-2 transition">
       <Dialog>
         <DialogTrigger asChild className="">
           <button
             type="button"
-            className="flex items-center justify-center cursor-pointer rounded-2xl bg-card border-border border w-full max-w-36 aspect-square hover:ring-primary hover:ring-2 transition"
+            className="flex items-center justify-center cursor-pointer rounded-2xl bg-card min-h-32 border-border border w-full hover:ring-primary hover:ring-2 transition"
           >
             <Plus size={45} strokeWidth={0.7} />
           </button>

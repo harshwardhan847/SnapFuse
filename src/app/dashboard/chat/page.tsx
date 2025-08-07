@@ -21,7 +21,7 @@ const Chats = (props: Props) => {
     );
 
   return (
-    <div className=" w-full flex gap-4 flex-wrap mt-8 md:max-w-6xl px-6">
+    <div className=" w-full grid md:grid-cols-5 gap-4 flex-wrap mt-8 md:max-w-6xl px-6">
       <CreateChatModal />
       <ChatList userId={user?.id} />
     </div>

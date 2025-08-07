@@ -8,8 +8,9 @@ export const addMessage = mutation({
     chatSessionId: v.string(),
     message: v.object({
       id: v.string(),
-      role: v.string(),
-      content: v.string(),
+      role: v.union(v.literal("assistant"), v.literal("user")),
+      parts: v.optional(v.any()),
+      text: v.optional(v.string()),
       type: v.union(v.literal("text"), v.literal("image")),
       status: v.optional(
         v.union(v.literal("pending"), v.literal("done"), v.literal("error"))

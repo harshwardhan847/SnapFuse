@@ -1,0 +1,99 @@
+"use client";
+
+import AnimatedAIChatInput from "@/components/mvpblocks/animated-ai-chat";
+import { cn } from "@/lib/utils";
+import { useChat } from "@ai-sdk/react";
+import {
+  ChatInit,
+  DefaultChatTransport,
+  generateId,
+  UIDataTypes,
+  UIMessage,
+  UITools,
+} from "ai";
+
+import { useState } from "react";
+import MessagesList from "./../_components/messages";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "../../../../../../convex/_generated/api";
+type Props = {
+  chatId: string;
+  initialMessages: UIMessage<unknown, UIDataTypes, UITools>[];
+};
+
+const Chat = ({ chatId, initialMessages }: Props) => {
+  const addMessage = useMutation(api.messages.addMessage);
+
+  const { messages, sendMessage, status, stop } = useChat({
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+    }),
+    messages: initialMessages,
+
+    onFinish: ({ message }) => {
+      addMessage({
+        chatSessionId: chatId,
+        message: {
+          parts: message.parts,
+          id: message.id,
+          role: "assistant",
+          type: "text",
+        },
+      });
+    },
+  });
+  const hasMessages = false || messages.length > 0;
+  const [input, setInput] = useState("");
+
+  console.log(messages);
+
+  return (
+    <div
+      className={cn(
+        "flex-1 min-h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] overflow-x-auto h-full flex items-center flex-col",
+        hasMessages ? "justify-between" : "justify-center"
+      )}
+    >
+      {hasMessages && <MessagesList messages={messages} />}
+
+      {(status === "submitted" || status === "streaming") && (
+        <div>
+          <button type="button" onClick={() => stop()}>
+            Stop
+          </button>
+        </div>
+      )}
+
+      <AnimatedAIChatInput
+        hasMessages={hasMessages}
+        setValue={setInput}
+        onSubmit={() => {
+          if (input.trim()) {
+            sendMessage({ text: input });
+            addMessage({
+              chatSessionId: chatId,
+              message: {
+                parts: [
+                  {
+                    text: input,
+                    type: "text",
+                    state: "done",
+                  },
+                ],
+                id: generateId(),
+                role: "user",
+                type: "text",
+              },
+            });
+            setInput("");
+          }
+        }}
+        value={input}
+        disabled={status !== "ready"}
+        isTyping={status === "submitted"}
+      />
+    </div>
+  );
+};
+
+export default Chat;
