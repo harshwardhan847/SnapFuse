@@ -3,6 +3,7 @@ import React from "react";
 import { api } from "../../../../../convex/_generated/api";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ChatMenu } from "./chat-menu";
 
 type Props = {
   userId: string;
@@ -30,8 +31,11 @@ const ChatList = ({ userId }: Props) => {
         <Link
           key={chat?._id}
           href={`/dashboard/chat/${chat?._id}`}
-          className="flex items-center justify-center cursor-pointer rounded-2xl bg-card border-border border w-full min-h-32 hover:ring-primary hover:ring-2 transition"
+          className="flex items-center relative justify-center cursor-pointer rounded-2xl bg-card border-border border w-full min-h-32 hover:ring-primary hover:ring-2 transition"
         >
+          <div className="absolute top-4 right-4">
+            <ChatMenu chat={chat} />
+          </div>
           {chat.title}
         </Link>
       ))}

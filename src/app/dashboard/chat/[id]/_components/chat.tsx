@@ -68,25 +68,26 @@ const Chat = ({ chatId, initialMessages }: Props) => {
         hasMessages={hasMessages}
         setValue={setInput}
         onSubmit={() => {
-          if (input.trim()) {
-            sendMessage({ text: input });
-            addMessage({
-              chatSessionId: chatId,
-              message: {
-                parts: [
-                  {
-                    text: input,
-                    type: "text",
-                    state: "done",
-                  },
-                ],
-                id: generateId(),
-                role: "user",
-                type: "text",
-              },
-            });
-            setInput("");
+          if (!input.trim()) {
+            return;
           }
+          sendMessage({ text: input });
+          addMessage({
+            chatSessionId: chatId,
+            message: {
+              parts: [
+                {
+                  text: input,
+                  type: "text",
+                  state: "done",
+                },
+              ],
+              id: generateId(),
+              role: "user",
+              type: "text",
+            },
+          });
+          setInput("");
         }}
         value={input}
         disabled={status !== "ready"}
