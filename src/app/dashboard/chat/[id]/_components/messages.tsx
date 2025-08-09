@@ -2,29 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Markdown } from "@/components/markdown";
 import { UIMessage } from "ai";
 
-const Typewriter = ({ text, speed = 30 }: { text: string; speed: number }) => {
-  const [displayed, setDisplayed] = useState("");
-  const indexRef = useRef(0);
-
-  useEffect(() => {
-    setDisplayed("");
-    indexRef.current = 0;
-
-    if (!text) return;
-
-    const interval = setInterval(() => {
-      setDisplayed((prev) =>
-        text?.[indexRef?.current] ? prev + text?.[indexRef?.current] : prev
-      );
-      indexRef.current += 1;
-      if (indexRef.current >= text.length) clearInterval(interval);
-    }, speed);
-    return () => clearInterval(interval);
-  }, [text, speed]);
-
-  return <Markdown>{displayed}</Markdown>;
-};
-
 const MessagesList = ({ messages }: { messages: UIMessage[] }) => {
   const messageEndRef = useRef<HTMLDivElement>(null);
 
@@ -56,13 +33,10 @@ const MessagesList = ({ messages }: { messages: UIMessage[] }) => {
             {message.parts.map((part, index) =>
               part.type === "text" ? (
                 // Only animate the latest assistant message
-                message.id === lastAssistantMsgId && message.role !== "user" ? (
-                  <Typewriter key={index} text={part.text} speed={5} />
-                ) : (
-                  <span key={index}>
-                    <Markdown>{part.text}</Markdown>
-                  </span>
-                )
+
+                <span key={index}>
+                  <Markdown>{part.text}</Markdown>
+                </span>
               ) : null
             )}
           </div>

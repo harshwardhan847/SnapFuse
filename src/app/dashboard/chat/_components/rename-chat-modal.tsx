@@ -1,10 +1,12 @@
 "use client";
+
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -20,77 +22,78 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader, Plus } from "lucide-react";
+import { Loader } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { api } from "../../../../../convex/_generated/api";
-import { useMutation, useQuery } from "convex/react";
-import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
 import { useUser } from "@clerk/nextjs";
+import { Doc } from "../../../../../convex/_generated/dataModel";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
-const formSchema = z.object({
-  chatName: z
+const renameFormSchema = z.object({
+  renameChat: z
     .string()
-    .min(2, { error: "Name should contain min of 2 characters" })
-    .max(50, { error: "Name should contain max of 50 characters" }),
+    .min(2, { message: "Name should contain min of 2 characters" })
+    .max(50, { message: "Name should contain max of 50 characters" }),
 });
 
-export function CreateChatModal() {
-  const createChat = useMutation(api.chats.createChat);
+export function RenameChatModal({ chat }: { chat: Doc<"chats"> }) {
+  const [open, setOpen] = useState(false);
+  const updateChat = useMutation(api.chats.updateChat);
   const { user } = useUser();
-  const router = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof renameFormSchema>>({
+    resolver: zodResolver(renameFormSchema),
     defaultValues: {
-      chatName: "",
+      renameChat: chat?.title,
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!formSchema.safeParse(values).success) {
-      toast.error("Invalid Data");
-      return;
-    }
-
+  async function onSubmit(values: z.infer<typeof renameFormSchema>) {
+    console.log(values);
     if (!user?.id) {
       toast.error("User Id Missing!");
       return;
     }
 
     try {
-      const chatId = await createChat({
-        title: values.chatName,
-        userId: user.id,
+      await updateChat({
+        title: values.renameChat,
+        chatId: chat?._id,
       });
-      router.push(`/dashboard/chat/${chatId}`);
+      toast.success("Chat renamed successfully");
+      setOpen(false);
     } catch (err) {
-      toast.error("Failed to create chat");
+      toast.error("Failed to update chat");
     }
   }
 
   return (
-    <div className="flex items-center justify-center cursor-pointer rounded-2xl bg-card min-h-32 border-border border w-full hover:ring-primary hover:ring-2 transition">
-      <Dialog>
+    <div className="w-full">
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild className="">
-          <button
-            type="button"
-            className="flex items-center justify-center cursor-pointer rounded-2xl bg-card min-h-32 border-border border w-full hover:ring-primary hover:ring-2 transition"
-          >
-            <Plus size={45} strokeWidth={0.7} />
-          </button>
+          <DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+            <button
+              type="button"
+              className="w-full text-start"
+              onClick={() => setOpen(true)}
+            >
+              Rename
+            </button>
+          </DropdownMenuItem>
         </DialogTrigger>
         <Form {...form}>
           <DialogContent className="sm:max-w-[425px]">
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <DialogHeader>
-                <DialogTitle>Create New Chat</DialogTitle>
+                <DialogTitle>Rename Chat</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 my-4">
                 <div className="grid gap-3">
                   <FormField
                     control={form.control}
-                    name="chatName"
+                    name="renameChat"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Name</FormLabel>
@@ -120,10 +123,10 @@ export function CreateChatModal() {
                   {form?.formState?.isSubmitting ? (
                     <>
                       <Loader size={12} className="animate-spin inline mr-2" />
-                      Creating chat
+                      Renaming
                     </>
                   ) : (
-                    "Create"
+                    "Rename"
                   )}
                 </Button>
               </DialogFooter>

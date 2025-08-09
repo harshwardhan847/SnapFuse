@@ -28,16 +28,20 @@ const ChatList = ({ userId }: Props) => {
   return (
     <>
       {chats?.map((chat) => (
-        <Link
+        <div
           key={chat?._id}
-          href={`/dashboard/chat/${chat?._id}`}
-          className="flex items-center relative justify-center cursor-pointer rounded-2xl bg-card border-border border w-full min-h-32 hover:ring-primary hover:ring-2 transition"
+          className="flex items-center relative justify-center cursor-pointer overflow-hidden rounded-2xl bg-card border-border border w-full min-h-32 hover:ring-primary hover:ring-2 transition"
         >
-          <div className="absolute top-4 right-4">
+          <div className="absolute top-2 right-2">
             <ChatMenu chat={chat} />
           </div>
-          {chat.title}
-        </Link>
+          <Link
+            href={`/dashboard/chat/${chat?._id}`}
+            className="w-full h-full flex items-center justify-center"
+          >
+            {chat.title}
+          </Link>
+        </div>
       ))}
     </>
   );

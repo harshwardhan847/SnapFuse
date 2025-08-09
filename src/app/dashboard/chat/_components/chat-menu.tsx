@@ -10,20 +10,21 @@ import { useMutation } from "convex/react";
 import { EllipsisVertical, Trash } from "lucide-react";
 import { api } from "../../../../../convex/_generated/api";
 import { Doc } from "../../../../../convex/_generated/dataModel";
+import { RenameChatModal } from "./rename-chat-modal";
 
 export function ChatMenu({ chat }: { chat: Doc<"chats"> }) {
   const deleteChat = useMutation(api.chats.deleteChat);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
+        <Button variant="ghost" size={"icon"} className="w-min px-0">
           <EllipsisVertical />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="start">
-        <DropdownMenuItem onClick={(e) => e.preventDefault()}>
-          Rename
-        </DropdownMenuItem>
+        <div className="w-full px-0">
+          <RenameChatModal chat={chat} />
+        </div>
         <DropdownMenuItem
           onClick={(e) => {
             e.preventDefault();
