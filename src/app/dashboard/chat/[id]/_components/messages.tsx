@@ -44,6 +44,7 @@ const MessagesList = ({ messages }: { messages: UIMessage[] }) => {
                 case "tool-generateSeoReadyContent":
                   return (
                     <SeoContent
+                      key={index}
                       data={
                         part.output as z.infer<typeof seoContentSchema> | null
                       }

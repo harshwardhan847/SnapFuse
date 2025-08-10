@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import {
@@ -37,7 +37,6 @@ import {
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useConvexAuth } from "convex/react";
 
 const menuItems = [
   { title: "Home", icon: LayoutDashboard, href: "/dashboard/home" },
@@ -50,16 +49,21 @@ const menuItems = [
 ];
 
 export const AdminSidebar = memo(() => {
+  const [isMounted, setIsMounted] = useState(false);
   const { setTheme, resolvedTheme } = useTheme();
   const pathname = usePathname();
   const isActive = (href: string): boolean => {
     return pathname.includes(href);
   };
   const { isSignedIn, isLoaded } = useAuth();
-  const { isAuthenticated } = useConvexAuth();
   const { openUserProfile } = useClerk();
   const { user } = useUser();
-  console.log(isAuthenticated);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
 
   return (
     <Sidebar collapsible="icon">
@@ -103,16 +107,18 @@ export const AdminSidebar = memo(() => {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() =>
-                setTheme(resolvedTheme === "dark" ? "light" : "dark")
-              }
-            >
-              {resolvedTheme === "dark" ? <Sun /> : <Moon />}
-              <span>
-                {resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}
-              </span>
-            </SidebarMenuButton>
+            {resolvedTheme ? (
+              <SidebarMenuButton
+                onClick={() =>
+                  setTheme(resolvedTheme === "dark" ? "light" : "dark")
+                }
+              >
+                {resolvedTheme === "dark" ? <Sun /> : <Moon />}
+                <span>
+                  {resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}
+                </span>
+              </SidebarMenuButton>
+            ) : null}
           </SidebarMenuItem>
           {isLoaded ? (
             <SidebarMenuItem>
