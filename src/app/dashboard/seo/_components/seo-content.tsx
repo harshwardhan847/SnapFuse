@@ -116,9 +116,7 @@ const SeoContent = ({ data, isLoading }: Props) => {
             Tags <CopyText text={tags?.join(", ")} />
           </Label>
           <div className="gap-2 flex w-full flex-wrap">
-            {tags?.map((val) => (
-              <Badge key={val}>{val}</Badge>
-            ))}
+            {tags?.map((val) => <Badge key={val}>{val}</Badge>)}
           </div>
         </FormItem>
       </CardFooter>

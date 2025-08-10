@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Markdown } from "@/components/markdown";
 import { UIMessage } from "ai";
+import SeoContent from "@/app/dashboard/seo/_components/seo-content";
+import { seoContentSchema } from "@/ai/schema";
+import z from "zod";
 
 const MessagesList = ({ messages }: { messages: UIMessage[] }) => {
   const messageEndRef = useRef<HTMLDivElement>(null);
@@ -27,18 +30,30 @@ const MessagesList = ({ messages }: { messages: UIMessage[] }) => {
             className={`max-w-3xl px-4 py-2 rounded-lg shadow-md ${
               message.role === "user"
                 ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-800 dark:invert"
+                : "bg-card text-card-foreground"
             }`}
           >
-            {message.parts.map((part, index) =>
-              part.type === "text" ? (
-                // Only animate the latest assistant message
-
-                <span key={index}>
-                  <Markdown>{part.text}</Markdown>
-                </span>
-              ) : null
-            )}
+            {message.parts.map((part, index) => {
+              switch (part.type) {
+                case "text":
+                  return (
+                    <span key={index}>
+                      <Markdown>{part.text}</Markdown>
+                    </span>
+                  );
+                case "tool-generateSeoReadyContent":
+                  return (
+                    <SeoContent
+                      data={
+                        part.output as z.infer<typeof seoContentSchema> | null
+                      }
+                      isLoading={part.state !== "output-available"}
+                    />
+                  );
+                default:
+                  null;
+              }
+            })}
           </div>
         </div>
       ))}
