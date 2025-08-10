@@ -1,20 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useQuery } from "convex/react";
-import { useState } from "react";
-import { api } from "../../../../convex/_generated/api";
 import { useAuth } from "@clerk/nextjs";
 import ImageList from "./_components/image-list";
+import { toast } from "sonner";
 
 export default function ImageGenerator() {
-  const [requestId, setRequestId] = useState<string | null>(null);
-  const [status, setStatus] = useState("idle");
   const { userId } = useAuth();
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
 
   async function generateImage(imageUrl: string, prompt: string) {
-    setStatus("processing");
     const response = await fetch("/api/generate-image", {
       method: "POST",
       body: JSON.stringify({ imageUrl, prompt, userId }),
@@ -22,21 +16,18 @@ export default function ImageGenerator() {
     });
     const data = await response.json();
     if (data.status === "processing") {
-      setRequestId(data.requestId);
-      setStatus("processing");
+      toast.success("Added to queue");
     } else {
-      setStatus("error");
+      toast.error("Error occurred during generation.");
+      console.error("Error occurred during generation.");
     }
   }
-
-  // You could implement polling or subscription here to update image status...
 
   if (!userId) return null;
 
   return (
-    <div className="flex items-center justify-center flex-col gap-4">
-      <ImageList userId={userId} />
-      {/* UI to upload image + enter prompt */}
+    <div className="flex items-center justify-center flex-col gap-4 p-8">
+      {/* // TODO : UI to upload image + enter prompt */}
       <Button
         onClick={() =>
           generateImage(
@@ -48,9 +39,10 @@ export default function ImageGenerator() {
         Generate Image
       </Button>
 
-      {status === "processing" && <p>Image generation in progress...</p>}
-      {status === "error" && <p>Error occurred during generation.</p>}
-      {generatedImage && <img src={generatedImage} alt="Generated Product" />}
+      <h2 className="text-2xl font-semibold text-start w-full">
+        Generated Images
+      </h2>
+      <ImageList userId={userId} />
     </div>
   );
 }
