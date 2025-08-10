@@ -27,7 +27,7 @@ const MessagesList = ({ messages }: { messages: UIMessage[] }) => {
           }`}
         >
           <div
-            className={`max-w-3xl px-4 py-2 rounded-lg shadow-md ${
+            className={`max-w-3xl w-full px-4 py-2 rounded-lg shadow-md ${
               message.role === "user"
                 ? "bg-blue-500 text-white"
                 : "bg-card text-card-foreground"

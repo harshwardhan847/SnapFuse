@@ -29,7 +29,7 @@ type Props = {
 const SeoContent = ({ data, isLoading }: Props) => {
   if (!data) {
     return (
-      <Card className="h-min">
+      <Card className="h-min w-full">
         <CardHeader>
           <CardTitle>{isLoading ? "Rank Higher" : "Checklist"}</CardTitle>
           <CardDescription>
