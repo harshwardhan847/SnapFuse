@@ -17,7 +17,7 @@ export default function ImageGenerator() {
     setStatus("processing");
     const response = await fetch("/api/generate-image", {
       method: "POST",
-      body: JSON.stringify({ imageUrl, prompt }),
+      body: JSON.stringify({ imageUrl, prompt, userId }),
       headers: { "Content-Type": "application/json" },
     });
     const data = await response.json();
@@ -34,7 +34,7 @@ export default function ImageGenerator() {
   if (!userId) return null;
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center flex-col gap-4">
       <ImageList userId={userId} />
       {/* UI to upload image + enter prompt */}
       <Button

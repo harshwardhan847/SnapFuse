@@ -27,7 +27,7 @@ const ImageList = ({ userId }: Props) => {
   }
 
   return (
-    <div className="space-y-6 mt-4">
+    <div className="space-y-6 mt-4 grid sm:grid-cols-2 md:grid-cols-3">
       {images.map((image) => {
         const status = image.status.toLowerCase();
         const badgeClass = statusColors[status] || "bg-gray-100 text-gray-800";
@@ -47,7 +47,7 @@ const ImageList = ({ userId }: Props) => {
             />
             <div className="flex-1 flex flex-col space-y-2">
               <h3
-                className="text-lg font-semibold text-gray-900 truncate"
+                className="text-lg font-semibold text-gray-900 truncate text-wrap line-clamp-2"
                 title={image.prompt}
               >
                 {image.prompt}

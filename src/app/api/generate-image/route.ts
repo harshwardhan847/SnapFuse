@@ -10,7 +10,7 @@ falConfig();
 
 export async function POST(request: NextRequest) {
   try {
-    const { imageUrl, prompt } = await request.json();
+    const { imageUrl, prompt, userId } = await request.json();
 
     const { request_id } = await fal.queue.submit("fal-ai/flux-kontext/dev", {
       input: { prompt, image_url: imageUrl },
@@ -19,8 +19,9 @@ export async function POST(request: NextRequest) {
 
     await convex.mutation(api.images.createImageJobRecord, {
       image_url: null,
-      prompt: prompt,
-      request_id: request_id,
+      prompt,
+      request_id,
+      userId,
     });
 
     return NextResponse.json({ status: "processing", requestId: request_id });
