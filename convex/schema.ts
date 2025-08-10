@@ -26,12 +26,30 @@ export default defineSchema({
       text: v.optional(v.string()),
       type: v.union(v.literal("text"), v.literal("image")), // "text" | "image" (new)
       status: v.optional(
-        v.union(v.literal("pending"), v.literal("done"), v.literal("error"))
+        v.union(
+          v.literal("pending"),
+          v.literal("processing"),
+          v.literal("done"),
+          v.literal("error")
+        )
       ), // "pending" | "done" | "error" (new)
-      imageUrl: v.optional(v.string()), // When status is "done"
-      createdAt: v.optional(v.number()),
+      image_url: v.optional(v.union(v.null(), v.string())), // When status is "done"
     }),
   }).index("byChatSessionId", ["chatSessionId"]),
+  images: defineTable({
+    request_id: v.string(),
+    prompt: v.string(),
+    image_url: v.union(v.null(), v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("processing"),
+      v.literal("done"),
+      v.literal("error")
+    ),
+    error_message: v.union(v.null(), v.string()),
+    updated_at: v.optional(v.string()),
+    userId: v.string(),
+  }).index("byUserId", ["userId"]),
 });
 
 export const MessageType = ["text", "image"] as const;

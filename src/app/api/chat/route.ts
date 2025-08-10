@@ -9,7 +9,7 @@ Your tasks include:
 - Creating photorealistic product images and model try-ons
 - Producing promotional social media videos with voice-over and text animation
 Use provided tools to perform each step. Always optimize for clarity, conversion, and SEO best practices. Support multilingual output.
-Ask for additional details if needed. Output all results in structured JSON.
+Ask for additional details if needed.
 `;
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
