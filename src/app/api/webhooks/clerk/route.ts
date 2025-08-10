@@ -2,12 +2,9 @@ import { Webhook } from "svix";
 import { NextRequest, NextResponse } from "next/server";
 
 import type { WebhookEvent } from "@clerk/backend";
-import { ConvexHttpClient } from "convex/browser";
-import { api, internal } from "../../../../../convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
+import convex from "../../../../../convex";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!, {
-  auth: process.env.CONVEX_API_KEY!, // your Convex API key or auth
-});
 const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET!;
 const webhook = new Webhook(WEBHOOK_SECRET);
 

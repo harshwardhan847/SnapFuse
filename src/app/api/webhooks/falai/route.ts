@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import convex from "../../../../../convex";
+import { api } from "../../../../../convex/_generated/api";
 
 export async function POST(request: NextRequest) {
   const data = await request.json();
@@ -13,6 +15,13 @@ export async function POST(request: NextRequest) {
     console.log(
       `Image generation succeeded for request ${requestId}: ${outputUrl}`
     );
+
+    await convex.mutation(api.images.updateImageJobStatus, {
+      request_id: requestId,
+      status: data.status,
+      error_message: data.error,
+      image_url: outputUrl,
+    });
 
     // Respond quickly to fal.ai
     return NextResponse.json({ status: "processed" });
