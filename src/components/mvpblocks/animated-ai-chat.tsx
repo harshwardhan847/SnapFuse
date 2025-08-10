@@ -156,30 +156,30 @@ export default function AnimatedAIChatInput({
   const commandPaletteRef = useRef<HTMLDivElement>(null);
 
   const commandSuggestions: CommandSuggestion[] = [
-    {
-      icon: <ImageIcon className="h-4 w-4" />,
-      label: "Clone UI",
-      description: "Generate a UI from a screenshot",
-      prefix: "/clone",
-    },
-    {
-      icon: <Figma className="h-4 w-4" />,
-      label: "Import Figma",
-      description: "Import a design from Figma",
-      prefix: "/figma",
-    },
-    {
-      icon: <MonitorIcon className="h-4 w-4" />,
-      label: "Create Page",
-      description: "Generate a new web page",
-      prefix: "/page",
-    },
-    {
-      icon: <Sparkles className="h-4 w-4" />,
-      label: "Improve",
-      description: "Improve existing UI design",
-      prefix: "/improve",
-    },
+    // {
+    //   icon: <ImageIcon className="h-4 w-4" />,
+    //   label: "Clone UI",
+    //   description: "Generate a UI from a screenshot",
+    //   prefix: "/clone",
+    // },
+    // {
+    //   icon: <Figma className="h-4 w-4" />,
+    //   label: "Import Figma",
+    //   description: "Import a design from Figma",
+    //   prefix: "/figma",
+    // },
+    // {
+    //   icon: <MonitorIcon className="h-4 w-4" />,
+    //   label: "Create Page",
+    //   description: "Generate a new web page",
+    //   prefix: "/page",
+    // },
+    // {
+    //   icon: <Sparkles className="h-4 w-4" />,
+    //   label: "Improve",
+    //   description: "Improve existing UI design",
+    //   prefix: "/improve",
+    // },
   ];
 
   useEffect(() => {
@@ -380,7 +380,7 @@ export default function AnimatedAIChatInput({
                 {showCommandPalette && (
                   <motion.div
                     ref={commandPaletteRef}
-                    className="border-border bg-background/90 sticky right-4 bottom-full left-4 z-50 mb-2 overflow-hidden rounded-lg border shadow-lg backdrop-blur-xl"
+                    className="border-border hidden bg-background/90 sticky right-4 bottom-full left-4 z-50 mb-2 overflow-hidden rounded-lg border shadow-lg backdrop-blur-xl"
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 5 }}
@@ -500,7 +500,7 @@ export default function AnimatedAIChatInput({
                     }}
                     whileTap={{ scale: 0.94 }}
                     className={cn(
-                      "group text-muted-foreground hover:text-foreground relative rounded-lg p-2 transition-colors",
+                      "group text-muted-foreground hover:text-foreground hidden relative rounded-lg p-2 transition-colors",
                       showCommandPalette && "bg-primary/20 text-foreground"
                     )}
                   >
