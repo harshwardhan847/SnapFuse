@@ -6,10 +6,13 @@ export const createImageJobRecord = mutation({
     request_id: v.string(),
     prompt: v.string(),
     image_url: v.union(v.string(), v.null()),
-    userId: v.string(),
   },
-  handler: async (ctx, { request_id, userId, prompt, image_url = null }) => {
+  handler: async (ctx, { request_id, prompt, image_url = null }) => {
     const now = new Date();
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const userId = identity.subject; // This is the Clerk user ID
     await ctx.db.insert("images", {
       request_id,
       userId,

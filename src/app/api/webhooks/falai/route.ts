@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import convex from "../../../../../convex";
+
 import { api } from "../../../../../convex/_generated/api";
+import convex from "@/convex";
 
 export async function POST(request: NextRequest) {
   const data = await request.json();
@@ -9,8 +10,6 @@ export async function POST(request: NextRequest) {
   if (data.status === "succeeded") {
     const outputUrl = data.payload?.images?.[0]?.url;
     const requestId = data.request_id;
-
-    // TODO: Store or update requestId and outputUrl in your database or state management
 
     console.log(
       `Image generation succeeded for request ${requestId}: ${outputUrl}`

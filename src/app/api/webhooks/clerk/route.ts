@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import type { WebhookEvent } from "@clerk/backend";
 import { api } from "../../../../../convex/_generated/api";
-import convex from "../../../../../convex";
+import convex from "@/convex";
 
 const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET!;
 const webhook = new Webhook(WEBHOOK_SECRET);
