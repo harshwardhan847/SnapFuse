@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -33,6 +33,9 @@ type Props = {
 const ImageGenerationModal = ({ userId }: Props) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const formSchema = z.object({
     imageUrl: z.string().url({ message: "Please enter a valid image URL" }),
@@ -63,6 +66,63 @@ const ImageGenerationModal = ({ userId }: Props) => {
     }
     setIsProcessing(false);
   }
+
+  async function uploadToConvex(file: File) {
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Upload failed");
+      }
+      const data = await res.json();
+      const url = data.url as string;
+      form.setValue("imageUrl", url, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      setPreviewUrl(url);
+      toast.success("Image uploaded");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to upload image");
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please drop an image file");
+        return;
+      }
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+      uploadToConvex(file);
+    }
+  }
+
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+  }
+
+  function handleFilePick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+      uploadToConvex(file);
+    }
+  }
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild className="self-end">
@@ -75,6 +135,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
               await generateImage(values.imageUrl, values.prompt);
               setIsDialogOpen(false);
               form.reset();
+              setPreviewUrl(null);
             })}
           >
             <DialogHeader>
@@ -87,14 +148,51 @@ const ImageGenerationModal = ({ userId }: Props) => {
                 name="imageUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URL</FormLabel>
+                    <FormLabel>Input Image</FormLabel>
                     <FormControl>
-                      <Input
-                        type="url"
-                        placeholder="https://example.com/image.jpg"
-                        disabled={isProcessing || form.formState.isSubmitting}
-                        {...field}
-                      />
+                      <div>
+                        <div
+                          onDrop={handleDrop}
+                          onDragOver={handleDragOver}
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex flex-col items-center justify-center gap-2 border border-dashed rounded-md p-6 text-center cursor-pointer hover:bg-muted/40"
+                        >
+                          {previewUrl ? (
+                            <img
+                              src={previewUrl}
+                              alt="Preview"
+                              className="max-h-40 w-auto object-contain rounded"
+                            />
+                          ) : (
+                            <>
+                              <span className="text-sm text-muted-foreground">
+                                Drag & drop an image here, or click to select
+                              </span>
+                            </>
+                          )}
+                          {isUploading && (
+                            <div className="mt-2 text-xs text-muted-foreground">
+                              Uploading...
+                            </div>
+                          )}
+                        </div>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleFilePick}
+                        />
+                        <input
+                          type="text"
+                          readOnly
+                          value={field.value}
+                          onChange={field.onChange}
+                          className="mt-2 w-full rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
+                          placeholder="Image URL will appear here after upload"
+                          disabled
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -111,7 +209,11 @@ const ImageGenerationModal = ({ userId }: Props) => {
                       <Textarea
                         rows={6}
                         placeholder="Describe what to generate..."
-                        disabled={isProcessing || form.formState.isSubmitting}
+                        disabled={
+                          isProcessing ||
+                          form.formState.isSubmitting ||
+                          isUploading
+                        }
                         {...field}
                       />
                     </FormControl>
@@ -126,14 +228,21 @@ const ImageGenerationModal = ({ userId }: Props) => {
                 <Button
                   variant="outline"
                   type="button"
-                  disabled={isProcessing || form.formState.isSubmitting}
+                  disabled={
+                    isProcessing || form.formState.isSubmitting || isUploading
+                  }
                 >
                   Cancel
                 </Button>
               </DialogClose>
               <Button
                 type="submit"
-                disabled={isProcessing || form.formState.isSubmitting}
+                disabled={
+                  isProcessing ||
+                  form.formState.isSubmitting ||
+                  isUploading ||
+                  !form.getValues("imageUrl")
+                }
               >
                 {isProcessing || form.formState.isSubmitting ? (
                   <>

@@ -22,6 +22,24 @@ export const createImageJobRecord = mutation({
   },
 });
 
+// Generate a signed upload URL for Convex Storage
+export const generateUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const uploadUrl = await ctx.storage.generateUploadUrl();
+    return uploadUrl;
+  },
+});
+
+// Return a signed, time-limited public URL for a stored file
+export const getStorageUrl = query({
+  args: { storageId: v.id("_storage") },
+  handler: async (ctx, { storageId }) => {
+    const url = await ctx.storage.getUrl(storageId);
+    return url;
+  },
+});
+
 export const updateImageJobStatus = mutation({
   args: {
     request_id: v.string(),

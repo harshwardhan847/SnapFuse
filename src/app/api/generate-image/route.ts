@@ -33,3 +33,20 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// Optional: handle direct file uploads by delegating to Convex storage
+export async function PUT(request: NextRequest) {
+  try {
+    const contentType = request.headers.get("content-type") || "";
+    if (!contentType.includes("multipart/form-data")) {
+      return NextResponse.json(
+        { error: "Expected multipart/form-data" },
+        { status: 400 }
+      );
+    }
+    // In this route we only pass through for future extension; currently uploads happen via /api/upload-image
+    return NextResponse.json({ status: "noop" });
+  } catch (error) {
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+  }
+}
