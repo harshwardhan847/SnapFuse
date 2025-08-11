@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
 type Props = {
   userId: string;
 };
@@ -161,7 +162,9 @@ const ImageGenerationModal = ({ userId }: Props) => {
                           className="flex flex-col items-center justify-center gap-2 border border-dashed rounded-md p-6 text-center cursor-pointer hover:bg-muted/40"
                         >
                           {previewUrl ? (
-                            <img
+                            <Image
+                              width={500}
+                              height={500}
                               src={previewUrl}
                               alt="Preview"
                               className="max-h-40 w-auto object-contain rounded"

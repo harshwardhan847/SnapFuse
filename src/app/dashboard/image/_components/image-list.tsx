@@ -24,6 +24,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
 
 type Props = {
   userId: string;
@@ -113,7 +114,9 @@ const ImageList = ({ userId }: Props) => {
                   setIsViewerOpen(true);
                 }}
               >
-                <img
+                <Image
+                  width={500}
+                  height={500}
                   src={image.image_url || "/placeholder.png"}
                   alt={`Generated image for prompt: ${image.prompt?.slice(0, 50)}`}
                   className="absolute inset-0 size-full object-cover"
@@ -199,7 +202,9 @@ const ImageList = ({ userId }: Props) => {
                   <Label>Input</Label>
                   <div className="flex items-center justify-center bg-muted/40 rounded-md max-h-[70vh] overflow-auto p-2">
                     {selectedImage?.input_storage_id ? (
-                      <img
+                      <Image
+                        width={500}
+                        height={500}
                         src={inputImageUrl || "/placeholder.png"}
                         alt="Input image"
                         className="max-h-[68vh] w-auto object-contain rounded"
@@ -231,7 +236,9 @@ const ImageList = ({ userId }: Props) => {
                 <div className="flex flex-col gap-2">
                   <Label>Output</Label>
                   <div className="flex items-center justify-center bg-muted/40 rounded-md max-h-[70vh] overflow-auto p-2">
-                    <img
+                    <Image
+                      width={500}
+                      height={500}
                       src={selectedImage.image_url || "/placeholder.png"}
                       alt={`Generated image for prompt: ${selectedImage.prompt}`}
                       className="max-h-[68vh] w-auto object-contain rounded"
