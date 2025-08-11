@@ -1,14 +1,56 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@clerk/nextjs";
 import ImageList from "./_components/image-list";
 import { toast } from "sonner";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader } from "lucide-react";
 
 export default function ImageGenerator() {
   const { userId } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const formSchema = z.object({
+    imageUrl: z
+      .string()
+      .url({ message: "Please enter a valid image URL" }),
+    prompt: z
+      .string()
+      .min(5, { message: "Prompt should be at least 5 characters" })
+      .max(1000, { message: "Prompt should be under 1000 characters" }),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { imageUrl: "", prompt: "" },
+  });
 
   async function generateImage(imageUrl: string, prompt: string) {
+    setIsProcessing(true);
     const response = await fetch("/api/generate-image", {
       method: "POST",
       body: JSON.stringify({ imageUrl, prompt, userId }),
@@ -21,23 +63,98 @@ export default function ImageGenerator() {
       toast.error("Error occurred during generation.");
       console.error("Error occurred during generation.");
     }
+    setIsProcessing(false);
   }
 
   if (!userId) return null;
 
   return (
     <div className="flex items-center justify-center flex-col gap-4 p-8">
-      {/* // TODO : UI to upload image + enter prompt */}
-      <Button
-        onClick={() =>
-          generateImage(
-            "https://images.meesho.com/images/products/445029933/0e3g7_512.avif?width=512",
-            "Create a high-resolution, photorealistic product image of a decorative gold owl figurine with intricate textured dots and a polished metallic finish. Place the owl on a clean, modern surface with soft, natural lighting that accentuates its shiny gold color and sculpted details. Use a minimalistic background in warm, neutral tones to convey elegance and sophistication, suitable for home décor or upscale catalog presentation. Ensure the owl is the central focus, with realistic shadows and gentle reflections to enhance its premium quality."
-          )
-        }
-      >
-        Generate Image
-      </Button>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button>Generate Image</Button>
+        </DialogTrigger>
+        <Form {...form}>
+          <DialogContent className="sm:max-w-[600px]">
+            <form
+              onSubmit={form.handleSubmit(async (values) => {
+                await generateImage(values.imageUrl, values.prompt);
+                setIsDialogOpen(false);
+                form.reset();
+              })}
+            >
+              <DialogHeader>
+                <DialogTitle>Generate Image</DialogTitle>
+              </DialogHeader>
+
+              <div className="grid gap-4 my-4">
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Image URL</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="url"
+                          placeholder="https://example.com/image.jpg"
+                          disabled={isProcessing || form.formState.isSubmitting}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="prompt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Prompt</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={6}
+                          placeholder="Describe what to generate..."
+                          disabled={isProcessing || form.formState.isSubmitting}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    variant="outline"
+                    type="button"
+                    disabled={isProcessing || form.formState.isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <Button
+                  type="submit"
+                  disabled={isProcessing || form.formState.isSubmitting}
+                >
+                  {isProcessing || form.formState.isSubmitting ? (
+                    <>
+                      <Loader size={14} className="animate-spin mr-2" />
+                      Generating
+                    </>
+                  ) : (
+                    "Generate"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Form>
+      </Dialog>
 
       <h2 className="text-2xl font-semibold text-start w-full">
         Generated Images
