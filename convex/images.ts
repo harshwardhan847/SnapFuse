@@ -73,6 +73,7 @@ export const getAllImagesByUserId = query({
     return ctx.db
       .query("images")
       .withIndex("byUserId", (q) => q.eq("userId", userId))
+      .order("desc")
       .collect();
   },
 });

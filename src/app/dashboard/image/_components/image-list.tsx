@@ -78,7 +78,7 @@ const ImageList = ({ userId }: Props) => {
           return (
             <Card
               key={image._id}
-              className="group overflow-hidden border hover:shadow-lg transition flex flex-col"
+              className="group overflow-hidden border hover:shadow-lg transition flex flex-col pt-0"
             >
               <div
                 className="relative aspect-[4/3] w-full bg-muted/40 cursor-pointer"
@@ -90,7 +90,7 @@ const ImageList = ({ userId }: Props) => {
                 <img
                   src={image.image_url || "/placeholder.png"}
                   alt={`Generated image for prompt: ${image.prompt?.slice(0, 50)}`}
-                  className="absolute inset-0 size-full object-contain"
+                  className="absolute inset-0 size-full object-cover"
                 />
 
                 <div className="absolute top-3 left-3">
