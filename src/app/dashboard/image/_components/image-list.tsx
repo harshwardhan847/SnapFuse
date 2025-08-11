@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Loader } from "lucide-react";
+import { Download, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -114,13 +114,30 @@ const ImageList = ({ userId }: Props) => {
                   setIsViewerOpen(true);
                 }}
               >
-                <Image
-                  width={500}
-                  height={500}
-                  src={image.image_url || "/placeholder.png"}
-                  alt={`Generated image for prompt: ${image.prompt?.slice(0, 50)}`}
-                  className="absolute inset-0 size-full object-cover"
-                />
+                {image.image_url && (
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    className="absolute top-2 right-2 z-10"
+                    onClick={() =>
+                      downloadImage(
+                        image.image_url as string,
+                        `image-${image.request_id || image._id}.png`
+                      )
+                    }
+                  >
+                    <Download />
+                  </Button>
+                )}
+                {image.image_url && (
+                  <Image
+                    width={500}
+                    height={500}
+                    src={image.image_url}
+                    alt={`Generated image for prompt: ${image.prompt?.slice(0, 50)}`}
+                    className="absolute inset-0 size-full object-cover"
+                  />
+                )}
 
                 <div className="absolute top-3 left-3">
                   <Badge className={`capitalize ${badgeClass}`}>
@@ -161,31 +178,6 @@ const ImageList = ({ userId }: Props) => {
                   >
                     View
                   </Button>
-                  {image.image_url && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        window.open(image.image_url as string, "_blank")
-                      }
-                    >
-                      Open Original
-                    </Button>
-                  )}
-                  {image.image_url && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        downloadImage(
-                          image.image_url as string,
-                          `image-${image.request_id || image._id}.png`
-                        )
-                      }
-                    >
-                      Download
-                    </Button>
-                  )}
                 </div>
               </CardContent>
             </Card>
@@ -201,11 +193,11 @@ const ImageList = ({ userId }: Props) => {
                 <div className="flex flex-col gap-2">
                   <Label>Input</Label>
                   <div className="flex items-center justify-center bg-muted/40 rounded-md max-h-[70vh] overflow-auto p-2">
-                    {selectedImage?.input_storage_id ? (
+                    {selectedImage?.input_storage_id && inputImageUrl ? (
                       <Image
                         width={500}
                         height={500}
-                        src={inputImageUrl || "/placeholder.png"}
+                        src={inputImageUrl}
                         alt="Input image"
                         className="max-h-[68vh] w-auto object-contain rounded"
                       />
@@ -239,7 +231,7 @@ const ImageList = ({ userId }: Props) => {
                     <Image
                       width={500}
                       height={500}
-                      src={selectedImage.image_url || "/placeholder.png"}
+                      src={selectedImage.image_url || ""}
                       alt={`Generated image for prompt: ${selectedImage.prompt}`}
                       className="max-h-[68vh] w-auto object-contain rounded"
                     />
