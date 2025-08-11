@@ -43,7 +43,7 @@ const MessagesList = ({ messages }: { messages: UIMessage[] }) => {
                   );
                 case "tool-generateSeoReadyContent":
                   return (
-                    <div className="w-full mt-4">
+                    <div key={part.toolCallId} className="w-full mt-4">
                       <SeoContent
                         key={index}
                         data={
