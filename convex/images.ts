@@ -6,15 +6,20 @@ export const createImageJobRecord = mutation({
     request_id: v.string(),
     prompt: v.string(),
     image_url: v.union(v.string(), v.null()),
+    input_storage_id: v.union(v.id("_storage"), v.null()),
     userId: v.string(),
   },
-  handler: async (ctx, { request_id, prompt, image_url = null, userId }) => {
+  handler: async (
+    ctx,
+    { request_id, prompt, image_url = null, input_storage_id = null, userId }
+  ) => {
     const now = new Date();
     await ctx.db.insert("images", {
       request_id,
       userId,
       prompt,
       image_url,
+      input_storage_id,
       status: "processing",
       error_message: null,
       updated_at: now.toDateString(),

@@ -10,7 +10,7 @@ falConfig();
 
 export async function POST(request: NextRequest) {
   try {
-    const { imageUrl, prompt, userId } = await request.json();
+    const { imageUrl, prompt, userId, inputStorageId } = await request.json();
 
     const { request_id } = await fal.queue.submit("fal-ai/flux-kontext/dev", {
       input: { prompt, image_url: imageUrl },
@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
       image_url: null,
       prompt,
       request_id,
+      input_storage_id: inputStorageId || null,
       userId,
     });
 

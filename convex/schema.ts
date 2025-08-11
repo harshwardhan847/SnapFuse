@@ -40,6 +40,7 @@ export default defineSchema({
     request_id: v.string(),
     prompt: v.string(),
     image_url: v.union(v.null(), v.string()),
+    input_storage_id: v.union(v.id("_storage"), v.null()),
     status: v.union(
       v.literal("pending"),
       v.literal("processing"),

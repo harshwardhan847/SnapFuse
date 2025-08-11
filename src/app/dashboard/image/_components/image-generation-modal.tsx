@@ -36,6 +36,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [inputStorageId, setInputStorageId] = useState<string | null>(null);
 
   const formSchema = z.object({
     imageUrl: z.string().url({ message: "Please enter a valid image URL" }),
@@ -54,7 +55,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
     setIsProcessing(true);
     const response = await fetch("/api/generate-image", {
       method: "POST",
-      body: JSON.stringify({ imageUrl, prompt, userId }),
+      body: JSON.stringify({ imageUrl, prompt, userId, inputStorageId }),
       headers: { "Content-Type": "application/json" },
     });
     const data = await response.json();
@@ -82,11 +83,13 @@ const ImageGenerationModal = ({ userId }: Props) => {
       }
       const data = await res.json();
       const url = data.url as string;
+      const storageId = (data.storageId as string) || null;
       form.setValue("imageUrl", url, {
         shouldValidate: true,
         shouldDirty: true,
       });
       setPreviewUrl(url);
+      setInputStorageId(storageId);
       toast.success("Image uploaded");
     } catch (err) {
       console.error(err);
