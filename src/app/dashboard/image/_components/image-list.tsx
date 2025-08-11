@@ -66,10 +66,11 @@ const ImageList = ({ userId }: Props) => {
 
   return (
     <>
-      <div className="grid gap-6 mt-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 mt-4 sm:grid-cols-2 lg:grid-cols-3 w-full">
         {images.map((image, index) => {
           const status = (image.status || "").toLowerCase();
-          const badgeClass = statusClasses[status] || "bg-muted text-foreground";
+          const badgeClass =
+            statusClasses[status] || "bg-muted text-foreground";
           const createdAtFormatted = image._creationTime
             ? format(new Date(image._creationTime), "PPP p")
             : "Unknown date";
@@ -88,12 +89,14 @@ const ImageList = ({ userId }: Props) => {
               >
                 <img
                   src={image.image_url || "/placeholder.png"}
-                  alt={`Generated image for prompt: ${image.prompt}`}
+                  alt={`Generated image for prompt: ${image.prompt?.slice(0, 50)}`}
                   className="absolute inset-0 size-full object-contain"
                 />
 
                 <div className="absolute top-3 left-3">
-                  <Badge className={`capitalize ${badgeClass}`}>{image.status}</Badge>
+                  <Badge className={`capitalize ${badgeClass}`}>
+                    {image.status}
+                  </Badge>
                 </div>
               </div>
 
@@ -133,7 +136,9 @@ const ImageList = ({ userId }: Props) => {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => window.open(image.image_url as string, "_blank")}
+                      onClick={() =>
+                        window.open(image.image_url as string, "_blank")
+                      }
                     >
                       Open Original
                     </Button>
@@ -166,7 +171,9 @@ const ImageList = ({ userId }: Props) => {
                 </DialogHeader>
 
                 <div className="flex items-center gap-2">
-                  <Badge className={`capitalize ${statusClasses[(selectedImage.status || "").toLowerCase()] || "bg-muted text-foreground"}`}>
+                  <Badge
+                    className={`capitalize ${statusClasses[(selectedImage.status || "").toLowerCase()] || "bg-muted text-foreground"}`}
+                  >
                     {selectedImage.status}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
@@ -189,7 +196,9 @@ const ImageList = ({ userId }: Props) => {
                       variant="outline"
                       onClick={async () => {
                         try {
-                          await navigator.clipboard.writeText(selectedImage.prompt || "");
+                          await navigator.clipboard.writeText(
+                            selectedImage.prompt || ""
+                          );
                         } catch {}
                       }}
                     >
@@ -198,7 +207,12 @@ const ImageList = ({ userId }: Props) => {
                     {selectedImage.image_url && (
                       <Button
                         size="sm"
-                        onClick={() => window.open(selectedImage.image_url as string, "_blank")}
+                        onClick={() =>
+                          window.open(
+                            selectedImage.image_url as string,
+                            "_blank"
+                          )
+                        }
                       >
                         Open Original
                       </Button>
