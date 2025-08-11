@@ -159,7 +159,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
                           onDrop={handleDrop}
                           onDragOver={handleDragOver}
                           onClick={() => fileInputRef.current?.click()}
-                          className="flex flex-col items-center justify-center gap-2 border border-dashed rounded-md p-6 text-center cursor-pointer hover:bg-muted/40"
+                          className="flex flex-col min-h-40 items-center justify-center gap-2 border border-dashed rounded-md p-6 text-center cursor-pointer hover:bg-muted/40"
                         >
                           {previewUrl ? (
                             <Image
@@ -194,7 +194,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
                           readOnly
                           value={field.value}
                           onChange={field.onChange}
-                          className="mt-2 w-full rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
+                          className="mt-2 w-full hidden rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
                           placeholder="Image URL will appear here after upload"
                           disabled
                         />
