@@ -228,13 +228,15 @@ const ImageList = ({ userId }: Props) => {
                 <div className="flex flex-col gap-2">
                   <Label>Output</Label>
                   <div className="flex items-center justify-center bg-muted/40 rounded-md max-h-[70vh] overflow-auto p-2">
-                    <Image
-                      width={500}
-                      height={500}
-                      src={selectedImage.image_url || ""}
-                      alt={`Generated image for prompt: ${selectedImage.prompt}`}
-                      className="max-h-[68vh] w-auto object-contain rounded"
-                    />
+                    {selectedImage.image_url && (
+                      <Image
+                        width={500}
+                        height={500}
+                        src={selectedImage.image_url || ""}
+                        alt={`Generated image for prompt: ${selectedImage.prompt}`}
+                        className="max-h-[68vh] w-auto object-contain rounded"
+                      />
+                    )}
                   </div>
                   {selectedImage.image_url && (
                     <div>

@@ -24,7 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 type Props = {
@@ -45,7 +45,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
     prompt: z
       .string()
       .min(5, { message: "Prompt should be at least 5 characters" })
-      .max(1000, { message: "Prompt should be under 1000 characters" }),
+      .max(1500, { message: "Prompt should be under 1000 characters" }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
