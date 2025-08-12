@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader } from "lucide-react";
+import { Loader, Wand2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -38,6 +38,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [inputStorageId, setInputStorageId] = useState<string | null>(null);
+  const [isPrompting, setIsPrompting] = useState(false);
 
   const formSchema = z.object({
     imageUrl: z.string().url({ message: "Please enter a valid image URL" }),
@@ -67,6 +68,31 @@ const ImageGenerationModal = ({ userId }: Props) => {
       console.error("Error occurred during generation.");
     }
     setIsProcessing(false);
+  }
+
+  async function handleGenerateOrImprovePrompt() {
+    try {
+      const image = form.getValues("imageUrl");
+      const userPrompt = form.getValues("prompt");
+      if (!image) {
+        toast.error("Upload an input image first");
+        return;
+      }
+      setIsPrompting(true);
+      const res = await fetch("/api/get-prompt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image, userPrompt: userPrompt || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      form.setValue("prompt", data.prompt || "", { shouldDirty: true });
+      toast.success(userPrompt ? "Prompt improved" : "Prompt generated");
+    } catch (e) {
+      toast.error("Failed to generate prompt");
+    } finally {
+      setIsPrompting(false);
+    }
   }
 
   async function uploadToConvex(file: File) {
@@ -212,16 +238,59 @@ const ImageGenerationModal = ({ userId }: Props) => {
                   <FormItem>
                     <FormLabel>Prompt</FormLabel>
                     <FormControl>
-                      <Textarea
-                        rows={6}
-                        placeholder="Describe what to generate..."
-                        disabled={
-                          isProcessing ||
-                          form.formState.isSubmitting ||
-                          isUploading
-                        }
-                        {...field}
-                      />
+                      <div className="relative">
+                        <Textarea
+                          rows={6}
+                          placeholder="Describe what to generate..."
+                          disabled={
+                            isProcessing ||
+                            form.formState.isSubmitting ||
+                            isUploading ||
+                            isPrompting
+                          }
+                          {...field}
+                        />
+                        <div className="absolute bottom-2 right-2 flex items-center gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="secondary"
+                            onClick={handleGenerateOrImprovePrompt}
+                            disabled={
+                              isProcessing ||
+                              isUploading ||
+                              isPrompting ||
+                              !form.getValues("imageUrl")
+                            }
+                            title="Auto-generate prompt"
+                          >
+                            {isPrompting ? (
+                              <Loader size={14} className="animate-spin" />
+                            ) : (
+                              <Sparkles size={16} />
+                            )}
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="secondary"
+                            onClick={handleGenerateOrImprovePrompt}
+                            disabled={
+                              isProcessing ||
+                              isUploading ||
+                              isPrompting ||
+                              !form.getValues("imageUrl")
+                            }
+                            title="Improve current prompt"
+                          >
+                            {isPrompting ? (
+                              <Loader size={14} className="animate-spin" />
+                            ) : (
+                              <Wand2 size={16} />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

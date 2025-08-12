@@ -1,7 +1,6 @@
 import { generateObject } from "ai";
 import { mainModel } from "../models";
 import { seoContentSchema } from "../schema";
-import z from "zod";
 
 export const getAiSeoReadyContent = async ({
   description,
