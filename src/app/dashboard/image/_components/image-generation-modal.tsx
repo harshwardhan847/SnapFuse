@@ -56,7 +56,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
     prompt: z
       .string()
       .min(5, { message: "Prompt should be at least 5 characters" })
-      .max(1500, { message: "Prompt should be under 1000 characters" }),
+      .max(2000, { message: "Prompt should be under 2000 characters" }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -260,6 +260,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
                       <div className="relative">
                         <Textarea
                           rows={6}
+                          className="max-h-32"
                           placeholder="Describe what to generate..."
                           disabled={
                             isProcessing ||

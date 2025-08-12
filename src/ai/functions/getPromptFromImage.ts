@@ -9,6 +9,7 @@ interface GetPromptFromImageOptions {
   detailLevel?: "ultra" | "high" | "medium";
   background?: string;
   upscale?: boolean;
+  useMannequin?: boolean; // optional explicit flag
 }
 
 export const getPromptFromImage = async ({
@@ -19,38 +20,57 @@ export const getPromptFromImage = async ({
   detailLevel,
   background,
   upscale,
+  useMannequin,
 }: GetPromptFromImageOptions) => {
-  // Negative prompt: discourage artifacts, overlaps, broken, deformed or cut-off elements
-  const negativePrompt =
-    "Do NOT include broken, deformed, floating, overlapping or partially cut-off objects or hands, no distracting backgrounds, no watermark, no text, no artifacts or out-of-place elements. Focus only on a realistic, cohesive, professional product scene.";
+  // Negative prompt: discourage artifacts, overlap, broken, etc.
+  const negativePrompt = [
+    "Do NOT include broken, deformed, floating, overlapping, cut-off objects, hands, or faces.",
+    "No watermark, no text, no artifacts, no irrelevant or distracting elements.",
+    // Avoid mannequins unless specifically requested
+    useMannequin
+      ? ""
+      : "Do NOT use mannequins, artificial hands or fake body parts. Prefer real human models or natural human interaction.",
+    "No cartoonish styles unless requested. Product colors, materials, branding, and textures must exactly match the input image.",
+    "No color or finish changes to the product. Do not remove or alter product logos.",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  // Main instruction set with sensible defaults for realism, product shine, and adaptive context
+  // Instruct model on human model/close-up preferences
+  const modelHumanInstruction = useMannequin
+    ? "If a mannequin is appropriate, use one for product display."
+    : "Show a realistic, natural human hand or model holding, using, or showcasing the product where possible. Avoid mannequins, unless explicitly specified. Only use close-ups when it best presents the product.";
+
+  // Assemble main instructions
   const systemInstructions = [
-    "Analyze the input image and identify the product and context.",
-    "Based on the image, generate a highly detailed, ultra-realistic, high-resolution prompt suitable for AI image generation that will make the product stand out professionally.",
-    userPrompt,
+    "Analyze the input image, especially the product's color, branding, material, and context.",
+    "Generate a detailed, ultra-realistic, high-quality prompt for AI image generation.",
+    "Always keep product color, materials, texture, and branding perfectly true to the image.",
+    modelHumanInstruction,
+    "Compose the scene as a creative, modern advertisement, suitable for a leading e-commerce or lifestyle visual.",
     style
       ? `Apply visual style: ${style}.`
-      : "If style is not specified, auto-select the most visually appealing and modern commercial/ad style for this product image.",
+      : "If no style, use a trendy, appealing commercial style, with balanced lighting and composition.",
     background
       ? `Use background: ${background}.`
-      : "If no background specified, pick the best possible photographic/commercial environment for this product.",
+      : "If background not specified, use a tasteful, creative, visually engaging and brand-appropriate commercial or lifestyle setting for the product.",
     detailLevel === "ultra"
-      ? "Emphasize ultra-fine detail, material texture, photorealistic lighting, and natural composition."
+      ? "Emphasize ultra-fine detail, realistic lighting, and natural composition."
       : detailLevel === "high"
-        ? "Emphasize realistic details, crisp product textures, and balanced lighting."
+        ? "Include rich product detail, commercial lighting, and crisp rendering."
         : "",
     creativity === "high"
-      ? "Add creative but plausible visual flair—unique compositions, advanced lighting, but keep product dominant."
+      ? "Add creative advertising details (dynamic backgrounds or hands, appealing settings), but ensure product realism."
       : creativity === "medium"
-        ? "Balance believable context with eye-catching details."
+        ? "Balance realism and visual interest, as in modern brand content."
         : creativity === "low"
-          ? "Make it closely match the original image, minimal deviation."
-          : "Make the result look as if shot for a premium e-commerce product listing, with optimal camera settings, angle, and scene.",
-    upscale ? "Request maximum sharpness and resolution." : "",
-    "Always make the product and its key features stand out in a natural, appealing way.",
+          ? "Keep scene and context as close to the input image as possible."
+          : "",
+    upscale ? "Request the highest possible image resolution and clarity." : "",
+    "Make the product and its features stand out naturally and appealingly.",
     `Negative prompt: ${negativePrompt}`,
-    "Output ONLY the image generator prompt. Don't describe the product separately, don't include 'prompt:' or commentary.",
+    "Output ONLY the image generator prompt — no explanations, no commentary.",
+    userPrompt,
   ]
     .filter(Boolean)
     .join(" ");

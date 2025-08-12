@@ -48,6 +48,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: "error_handled" });
   }
 
+  await convex.mutation(api.images.updateImageJobStatus, {
+    request_id: requestId,
+    status: data.status,
+    error_message: null,
+    image_url: null,
+  });
+
   // For any other statuses (e.g., queued, processing notifications)
   // optionally log or ignore them
   console.log(
