@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/form";
 
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import Image from "next/image";
 type Props = {
   userId: string;
@@ -39,6 +40,16 @@ const ImageGenerationModal = ({ userId }: Props) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [inputStorageId, setInputStorageId] = useState<string | null>(null);
   const [isPrompting, setIsPrompting] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [advStyle, setAdvStyle] = useState<string>("");
+  const [advCreativity, setAdvCreativity] = useState<
+    "high" | "medium" | "low" | ""
+  >("");
+  const [advDetailLevel, setAdvDetailLevel] = useState<
+    "ultra" | "high" | "medium" | ""
+  >("");
+  const [advBackground, setAdvBackground] = useState<string>("");
+  const [advUpscale, setAdvUpscale] = useState<boolean>(false);
 
   const formSchema = z.object({
     imageUrl: z.string().url({ message: "Please enter a valid image URL" }),
@@ -82,7 +93,15 @@ const ImageGenerationModal = ({ userId }: Props) => {
       const res = await fetch("/api/get-prompt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image, userPrompt: userPrompt || undefined }),
+        body: JSON.stringify({
+          image,
+          userPrompt: userPrompt || undefined,
+          style: advStyle || undefined,
+          creativity: (advCreativity as any) || undefined,
+          detailLevel: (advDetailLevel as any) || undefined,
+          background: advBackground || undefined,
+          upscale: advUpscale || undefined,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
@@ -296,6 +315,83 @@ const ImageGenerationModal = ({ userId }: Props) => {
                   </FormItem>
                 )}
               />
+
+              <div className="border rounded-md">
+                <button
+                  type="button"
+                  onClick={() => setAdvancedOpen((v) => !v)}
+                  className="w-full flex items-center justify-between px-3 py-2 text-sm"
+                >
+                  Advanced options
+                  <span className="text-xs text-muted-foreground">
+                    {advancedOpen ? "Hide" : "Show"}
+                  </span>
+                </button>
+                {advancedOpen && (
+                  <div className="p-3 grid gap-3">
+                    <div>
+                      <label className="text-sm">Style</label>
+                      <Input
+                        placeholder="e.g. cinematic, studio, minimal"
+                        value={advStyle}
+                        onChange={(e) => setAdvStyle(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <div>
+                        <label className="text-sm">Creativity</label>
+                        <select
+                          className="mt-1 block w-full rounded-md border bg-transparent px-3 py-2 text-sm"
+                          value={advCreativity}
+                          onChange={(e) =>
+                            setAdvCreativity(e.target.value as any)
+                          }
+                        >
+                          <option value="">Auto</option>
+                          <option value="low">Low</option>
+                          <option value="medium">Medium</option>
+                          <option value="high">High</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm">Detail level</label>
+                        <select
+                          className="mt-1 block w-full rounded-md border bg-transparent px-3 py-2 text-sm"
+                          value={advDetailLevel}
+                          onChange={(e) =>
+                            setAdvDetailLevel(e.target.value as any)
+                          }
+                        >
+                          <option value="">Auto</option>
+                          <option value="medium">Medium</option>
+                          <option value="high">High</option>
+                          <option value="ultra">Ultra</option>
+                        </select>
+                      </div>
+                      <div className="flex items-end gap-2">
+                        <input
+                          id="adv-upscale"
+                          type="checkbox"
+                          className="size-4"
+                          checked={advUpscale}
+                          onChange={(e) => setAdvUpscale(e.target.checked)}
+                        />
+                        <label htmlFor="adv-upscale" className="text-sm">
+                          Upscale
+                        </label>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm">Background</label>
+                      <Input
+                        placeholder="e.g. studio background, beach, marble table"
+                        value={advBackground}
+                        onChange={(e) => setAdvBackground(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <DialogFooter>

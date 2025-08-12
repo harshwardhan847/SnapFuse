@@ -33,7 +33,15 @@ async function fetchAndMaybeConvertToSupported(imageUrl: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { image, userPrompt } = await request.json();
+    const {
+      image,
+      userPrompt,
+      style,
+      creativity,
+      detailLevel,
+      background,
+      upscale,
+    } = await request.json();
     if (!image || typeof image !== "string") {
       return NextResponse.json({ error: "Missing image URL" }, { status: 400 });
     }
@@ -46,6 +54,11 @@ export async function POST(request: NextRequest) {
     const prompt = await getPromptFromImage({
       image: normalizedImage,
       userPrompt,
+      style,
+      creativity,
+      detailLevel,
+      background,
+      upscale,
     });
     return NextResponse.json({ prompt });
   } catch (error) {
