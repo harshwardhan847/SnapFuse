@@ -1,6 +1,8 @@
 import { Tool } from "ai";
 import z from "zod";
 import { getPromptFromImage } from "../functions/getPromptFromImage";
+import convex from "@/convex";
+import { api } from "../../../convex/_generated/api";
 
 /**
  * Generate a high-quality, realistic, ad-worthy ecommerce catalogue or product listing image from a product photo.
@@ -15,10 +17,10 @@ export const generatePromptFromImageTool: Tool = {
     "Generate a high-quality, realistic, ad-worthy ecommerce catalogue or product listing image from a product image and details. The output uses realistic lighting, creative commercial backgrounds, and always accurately preserves product color, material, branding, and features. Human model/hand is preferred unless mannequin is explicitly requested.",
 
   inputSchema: z.object({
-    image: z
+    inputStorageId: z
       .string()
       .describe(
-        "Product image as URL or base64 that acts as the visual source reference for generation."
+        "Required. The storage ID of the product image that acts as the visual source reference for generation."
       ),
     userPrompt: z
       .string()
@@ -60,21 +62,11 @@ export const generatePromptFromImageTool: Tool = {
       .describe(
         "Optional. If true, allows mannequins; otherwise, uses a real human model/hand where possible."
       ),
-    userId: z
-      .string()
-      .describe(
-        "Required. Unique identifier for the user performing this operation."
-      ),
-    inputStorageId: z
-      .string()
-      .describe(
-        "Required. ID of the user's original uploaded product image, for asset management/auditing."
-      ),
   }),
 
   // Main tool execution
   execute: async ({
-    image,
+    inputStorageId,
     userPrompt,
     style,
     creativity,
@@ -82,36 +74,43 @@ export const generatePromptFromImageTool: Tool = {
     background,
     upscale,
     useMannequin,
-    userId,
-    inputStorageId,
   }) => {
-    // Step 1: Generate the detailed image prompt from the input image & user intent
-    const prompt = await getPromptFromImage({
-      image,
-      userPrompt,
-      style,
-      creativity,
-      detailLevel,
-      background,
-      upscale,
-      useMannequin,
-    });
+    try {
+      const baseUrl =
+        process.env.APP_BASE_URL ||
+        process.env.NEXT_PUBLIC_APP_URL ||
+        "http://localhost:3000";
 
-    // Step 2: Call the backend API to start image generation with that prompt
-    const response = await fetch("/api/generate-image", {
-      method: "POST",
-      body: JSON.stringify({ imageUrl: image, prompt, userId, inputStorageId }),
-      headers: { "Content-Type": "application/json" },
-    });
+      // Step 1: Get the image data URL from storage ID (absolute URL required on server)
 
-    if (!response.ok) {
-      const errorJson = await response.json().catch(() => ({}));
+      const url = await convex.query(api.images.getStorageUrl, {
+        storageId: inputStorageId as any,
+      });
+
+      if (!url) {
+        throw new Error(`Failed to get image URL`);
+      }
+
+      // Step 2: Generate the detailed image prompt from the input image & user intent
+      const prompt = await getPromptFromImage({
+        image: url,
+        userPrompt,
+        style,
+        creativity,
+        detailLevel,
+        background,
+        upscale,
+        useMannequin,
+      });
+
+      return prompt;
+    } catch (error) {
+      console.error("Error in generatePromptFromImageTool:", error);
       throw new Error(
-        `Image generation failed (${response.status}): ${errorJson?.error || response.statusText}`
+        `Failed to process image: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
       );
     }
-
-    // The backend returns { status: "processing", requestId: ... } or error
-    return await response.json();
   },
 };

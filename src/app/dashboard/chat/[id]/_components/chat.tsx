@@ -16,17 +16,31 @@ import { useState } from "react";
 import MessagesList from "./../_components/messages";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../../convex/_generated/api";
+import { useAuth } from "@clerk/nextjs";
+
+interface Attachment {
+  url: string;
+  storageId: string;
+}
+
 type Props = {
   chatId: string;
   initialMessages: UIMessage<unknown, UIDataTypes, UITools>[];
 };
 
 const Chat = ({ chatId, initialMessages }: Props) => {
+  const { userId } = useAuth();
   const addMessage = useMutation(api.messages.addMessage);
 
   const { messages, sendMessage, status, stop } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: {
+        userId: userId || "anonymous",
+      },
     }),
     messages: initialMessages,
 
@@ -75,8 +89,13 @@ const Chat = ({ chatId, initialMessages }: Props) => {
           if (input.trim()) {
             parts.push({ text: input, type: "text", state: "done" });
           }
-          for (const url of attachments) {
-            parts.push({ type: "image", image_url: url, state: "done" });
+          for (const attachment of attachments) {
+            parts.push({
+              type: "image",
+              image_url: attachment.url,
+              storage_id: attachment.storageId,
+              state: "done",
+            });
           }
 
           sendMessage({ parts });

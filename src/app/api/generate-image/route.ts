@@ -9,7 +9,16 @@ falConfig();
 
 export async function POST(request: NextRequest) {
   try {
-    const { imageUrl, prompt, userId, inputStorageId } = await request.json();
+    const { inputStorageId, prompt, userId } = await request.json();
+
+    // Get the image URL from the storage ID
+    const imageUrl = await convex.query(api.images.getStorageUrl, {
+      storageId: inputStorageId as any,
+    });
+
+    if (!imageUrl) {
+      return NextResponse.json({ error: "Image not found" }, { status: 404 });
+    }
 
     const { request_id } = await fal.queue.submit("fal-ai/flux-kontext/dev", {
       input: { prompt, image_url: imageUrl },

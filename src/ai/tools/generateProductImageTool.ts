@@ -11,10 +11,10 @@ export const generateProductImageTool: Tool = {
     "Generate a high-quality, realistic, ad-worthy ecommerce catalogue or product listing image from a standard product image and an AI-generated prompt (create this with the generatePromptFromImage tool). The generated image will use realistic lighting, creative commercial backgrounds, and will always accurately preserve product color, material, branding, and features.",
 
   inputSchema: z.object({
-    imageUrl: z
+    inputStorageId: z
       .string()
       .describe(
-        "A product image URL or data URL to use as the source reference for upscaling/enhancement. This is the product image to transform into a catalogue-ready output."
+        "Required. The storage ID of the product image to use as the source reference for upscaling/enhancement. This is the product image to transform into a catalogue-ready output."
       ),
     prompt: z
       .string()
@@ -24,12 +24,7 @@ export const generateProductImageTool: Tool = {
     userId: z
       .string()
       .describe(
-        "The unique identifier of the user creating this image. Used for tracking and auditing."
-      ),
-    inputStorageId: z
-      .string()
-      .describe(
-        "The storage ID/reference for the original user upload. Used for asset management."
+        "Required. The unique identifier of the user creating this image. Used for tracking and auditing."
       ),
     // Future expansion hooks:
     // style, background, creativity, outputFormat, etc could be added if you extend the /api/generate-image endpoint
@@ -39,11 +34,15 @@ export const generateProductImageTool: Tool = {
    * Execute the product image generation workflow using the provided image and AI-crafted prompt.
    * If the backend/API fails, returns a consistent error object.
    */
-  execute: async ({ imageUrl, prompt, userId, inputStorageId }) => {
+  execute: async ({ inputStorageId, prompt, userId }) => {
     try {
       const response = await fetch("/api/generate-image", {
         method: "POST",
-        body: JSON.stringify({ imageUrl, prompt, userId, inputStorageId }),
+        body: JSON.stringify({
+          inputStorageId,
+          prompt,
+          userId,
+        }),
         headers: { "Content-Type": "application/json" },
       });
       if (!response.ok) {

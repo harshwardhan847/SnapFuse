@@ -126,6 +126,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 );
 Textarea.displayName = "Textarea";
 
+interface Attachment {
+  url: string;
+  storageId: string;
+}
+
 export default function AnimatedAIChatInput({
   onSubmit,
   value,
@@ -134,7 +139,7 @@ export default function AnimatedAIChatInput({
   hasMessages,
   isTyping,
 }: {
-  onSubmit: (attachments: string[]) => void;
+  onSubmit: (attachments: Attachment[]) => void;
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
   disabled: boolean;
@@ -142,7 +147,7 @@ export default function AnimatedAIChatInput({
   isTyping: boolean;
 }) {
   // const [value, setValue] = useState("");
-  const [attachments, setAttachments] = useState<string[]>([]);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -294,8 +299,14 @@ export default function AnimatedAIChatInput({
         return;
       }
       const data = await res.json();
-      if (data?.url) {
-        setAttachments((prev) => [...prev, data.url as string]);
+      if (data?.url && data?.storageId) {
+        setAttachments((prev) => [
+          ...prev,
+          {
+            url: data.url as string,
+            storageId: data.storageId as string,
+          },
+        ]);
       }
     } finally {
       setIsUploading(false);
@@ -483,7 +494,7 @@ export default function AnimatedAIChatInput({
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                   >
-                    {attachments.map((url, index) => (
+                    {attachments.map((attachment, index) => (
                       <motion.div
                         key={index}
                         className="bg-primary/5 text-muted-foreground flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs"
@@ -492,7 +503,7 @@ export default function AnimatedAIChatInput({
                         exit={{ opacity: 0, scale: 0.9 }}
                       >
                         <img
-                          src={url}
+                          src={attachment.url}
                           alt="attachment"
                           className="h-10 w-10 rounded object-cover"
                         />
