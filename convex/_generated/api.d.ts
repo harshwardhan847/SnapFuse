@@ -17,6 +17,7 @@ import type * as chats from "../chats.js";
 import type * as images from "../images.js";
 import type * as messages from "../messages.js";
 import type * as users from "../users.js";
+import type * as videos from "../videos.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -31,6 +32,7 @@ declare const fullApi: ApiFromModules<{
   images: typeof images;
   messages: typeof messages;
   users: typeof users;
+  videos: typeof videos;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
