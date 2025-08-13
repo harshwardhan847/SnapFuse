@@ -4,6 +4,8 @@ import { api } from "../../../../../convex/_generated/api";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChatMenu } from "./chat-menu";
+import { DocumentType } from "next/dist/shared/lib/utils";
+import { Doc } from "../../../../../convex/_generated/dataModel";
 
 type Props = {
   userId: string;
@@ -27,7 +29,7 @@ const ChatList = ({ userId }: Props) => {
   }
   return (
     <>
-      {chats?.map((chat) => (
+      {chats?.map((chat: Doc<"chats">) => (
         <div
           key={chat?._id}
           className="flex items-center relative justify-center cursor-pointer overflow-hidden rounded-2xl bg-card border-border border w-full min-h-32 hover:ring-primary hover:ring-2 transition"

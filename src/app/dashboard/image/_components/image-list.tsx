@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
+import { Doc } from "../../../../../convex/_generated/dataModel";
 
 type Props = {
   userId: string;
@@ -94,7 +95,7 @@ const ImageList = ({ userId }: Props) => {
   return (
     <>
       <div className="grid gap-6 mt-4 sm:grid-cols-2 lg:grid-cols-3 w-full">
-        {images.map((image, index) => {
+        {images.map((image: Doc<"images">, index: number) => {
           const status = (image.status || "").toLowerCase();
           const badgeClass =
             statusClasses[status] || "bg-muted text-foreground";
