@@ -67,24 +67,26 @@ const Chat = ({ chatId, initialMessages }: Props) => {
       <AnimatedAIChatInput
         hasMessages={hasMessages}
         setValue={setInput}
-        onSubmit={() => {
-          if (!input.trim()) {
+        onSubmit={(attachments) => {
+          if (!input.trim() && attachments.length === 0) {
             return;
           }
-          sendMessage({ text: input });
+          const parts: any[] = [];
+          if (input.trim()) {
+            parts.push({ text: input, type: "text", state: "done" });
+          }
+          for (const url of attachments) {
+            parts.push({ type: "image", image_url: url, state: "done" });
+          }
+
+          sendMessage({ parts });
           addMessage({
             chatSessionId: chatId,
             message: {
-              parts: [
-                {
-                  text: input,
-                  type: "text",
-                  state: "done",
-                },
-              ],
+              parts,
               id: generateId(),
               role: "user",
-              type: "text",
+              type: attachments.length > 0 ? "image" : "text",
             },
           });
           setInput("");

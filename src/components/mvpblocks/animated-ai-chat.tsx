@@ -134,7 +134,7 @@ export default function AnimatedAIChatInput({
   hasMessages,
   isTyping,
 }: {
-  onSubmit: () => void;
+  onSubmit: (attachments: string[]) => void;
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
   disabled: boolean;
@@ -143,6 +143,8 @@ export default function AnimatedAIChatInput({
 }) {
   // const [value, setValue] = useState("");
   const [attachments, setAttachments] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isPending, startTransition] = useTransition();
   const [activeSuggestion, setActiveSuggestion] = useState<number>(-1);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
@@ -266,18 +268,46 @@ export default function AnimatedAIChatInput({
   };
 
   const handleSendMessage = async () => {
-    if (value.trim()) {
+    if (value.trim() || attachments.length > 0) {
       startTransition(() => {
-        onSubmit();
-
+        onSubmit(attachments);
+        setAttachments([]);
         adjustHeight(true);
       });
     }
   };
 
   const handleAttachFile = () => {
-    const mockFileName = `file-${Math.floor(Math.random() * 1000)}.pdf`;
-    setAttachments((prev) => [...prev, mockFileName]);
+    fileInputRef.current?.click();
+  };
+
+  const uploadImage = async (file: File) => {
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        return;
+      }
+      const data = await res.json();
+      if (data?.url) {
+        setAttachments((prev) => [...prev, data.url as string]);
+      }
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handlePickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+    uploadImage(file);
+    e.currentTarget.value = "";
   };
 
   const removeAttachment = (index: number) => {
@@ -453,7 +483,7 @@ export default function AnimatedAIChatInput({
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                   >
-                    {attachments.map((file, index) => (
+                    {attachments.map((url, index) => (
                       <motion.div
                         key={index}
                         className="bg-primary/5 text-muted-foreground flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs"
@@ -461,7 +491,11 @@ export default function AnimatedAIChatInput({
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                       >
-                        <span>{file}</span>
+                        <img
+                          src={url}
+                          alt="attachment"
+                          className="h-10 w-10 rounded object-cover"
+                        />
                         <button
                           onClick={() => removeAttachment(index)}
                           disabled={disabled}
@@ -484,12 +518,19 @@ export default function AnimatedAIChatInput({
                     whileTap={{ scale: 0.94 }}
                     className="group text-muted-foreground hover:text-foreground relative rounded-lg p-2 transition-colors"
                   >
-                    <Paperclip className="h-4 w-4" />
+                    <ImageIcon className="h-4 w-4" />
                     <motion.span
                       className="bg-primary/10 absolute inset-0 rounded-lg opacity-0 transition-opacity group-hover:opacity-100"
                       layoutId="button-highlight"
                     />
                   </motion.button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePickFile}
+                  />
                   <motion.button
                     type="button"
                     data-command-button
@@ -517,16 +558,21 @@ export default function AnimatedAIChatInput({
                   onClick={handleSendMessage}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
-                  disabled={isTyping || !value.trim() || disabled}
+                  disabled={
+                    isTyping ||
+                    (value.trim().length === 0 && attachments.length === 0) ||
+                    disabled ||
+                    isUploading
+                  }
                   className={cn(
                     "rounded-lg px-4 py-2 text-sm font-medium transition-all",
                     "flex items-center gap-2",
-                    value.trim()
+                    value.trim() || attachments.length > 0
                       ? "bg-primary text-primary-foreground shadow-primary/10 shadow-lg"
                       : "bg-muted/50 text-muted-foreground"
                   )}
                 >
-                  {isTyping ? (
+                  {isTyping || isUploading ? (
                     <LoaderIcon className="h-4 w-4 animate-[spin_2s_linear_infinite]" />
                   ) : (
                     <SendIcon className="h-4 w-4" />
