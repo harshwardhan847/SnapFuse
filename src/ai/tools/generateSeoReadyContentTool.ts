@@ -3,7 +3,7 @@ import { seoContentSchema } from "../schema";
 import { getAiSeoReadyContent } from "../functions/getAiSeoReadyContent";
 import z from "zod";
 
-export const generateSeoReadyContent: Tool = {
+export const generateSeoReadyContentTool: Tool = {
   description:
     "generate content for e-commerce listing with very good SEO to rank higher in search",
   outputSchema: seoContentSchema,

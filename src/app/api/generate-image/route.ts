@@ -1,4 +1,3 @@
-// app/api/generate-image/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { fal } from "@fal-ai/client";
 import falConfig from "@/fal";

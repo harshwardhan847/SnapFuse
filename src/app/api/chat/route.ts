@@ -1,5 +1,5 @@
 import { mainModel } from "@/ai/models";
-import { generateSeoReadyContent } from "@/ai/tools/generateSeoReadyContent";
+import { Tools } from "@/ai/tools";
 import { convertToModelMessages, streamText, UIMessage } from "ai";
 
 const SYSTEM_PROMPT = `
@@ -21,9 +21,7 @@ export async function POST(req: Request) {
     model: mainModel,
     system: SYSTEM_PROMPT,
     messages: convertToModelMessages(messages),
-    tools: {
-      generateSeoReadyContent,
-    },
+    tools: Tools,
   });
 
   return result.toUIMessageStreamResponse();
