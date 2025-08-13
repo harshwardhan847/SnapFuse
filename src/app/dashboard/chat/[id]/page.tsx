@@ -25,7 +25,7 @@ export default function Page() {
     <Chat
       chatId={params.id}
       initialMessages={
-        initialMessages?.map((message) => message.message) as UIMessage<
+        initialMessages?.map((message: any) => message.message) as UIMessage<
           unknown,
           UIDataTypes,
           UITools

@@ -9,20 +9,47 @@ export async function POST(request: NextRequest) {
 
   // Handle success case (status "OK")
   if (data.status === "OK") {
-    const outputUrl = data.payload?.images?.[0]?.url || null;
+    const imageUrl =
+      data.payload?.images?.[0]?.url || data.images?.[0]?.url || null;
+    const videoUrl = data.payload?.video?.url || data.video?.url || null;
 
-    console.log(
-      `Image generation succeeded for request ${requestId}: ${outputUrl}`
-    );
-
-    await convex.mutation(api.images.updateImageJobStatus, {
+    // Decide whether this request was for image or video
+    const imageJob = await convex.query(api.images.getImageJobByRequestId, {
       request_id: requestId,
-      status: "done",
-      error_message: null,
-      image_url: outputUrl,
     });
 
-    return NextResponse.json({ status: "processed" });
+    if (imageJob) {
+      console.log(
+        `Image generation succeeded for request ${requestId}: ${imageUrl}`
+      );
+      await convex.mutation(api.images.updateImageJobStatus, {
+        request_id: requestId,
+        status: "done",
+        error_message: null,
+        image_url: imageUrl,
+      });
+      return NextResponse.json({ status: "processed" });
+    }
+
+    const videoJob = await convex.query(api.videos.getVideoJobByRequestId, {
+      request_id: requestId,
+    });
+
+    if (videoJob) {
+      console.log(
+        `Video generation succeeded for request ${requestId}: ${videoUrl}`
+      );
+      await convex.mutation(api.videos.updateVideoJobStatus, {
+        request_id: requestId,
+        status: "done",
+        error_message: null,
+        video_url: videoUrl,
+      });
+      return NextResponse.json({ status: "processed" });
+    }
+
+    // If neither job is found, ignore
+    return NextResponse.json({ status: "ignored" });
   }
 
   // Handle error case (status "ERROR")
@@ -48,12 +75,30 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: "error_handled" });
   }
 
-  await convex.mutation(api.images.updateImageJobStatus, {
+  // For other statuses, update the corresponding job if present
+  const imageJob = await convex.query(api.images.getImageJobByRequestId, {
     request_id: requestId,
-    status: data.status,
-    error_message: null,
-    image_url: null,
   });
+  if (imageJob) {
+    await convex.mutation(api.images.updateImageJobStatus, {
+      request_id: requestId,
+      status: data.status,
+      error_message: null,
+      image_url: null,
+    });
+  } else {
+    const videoJob = await convex.query(api.videos.getVideoJobByRequestId, {
+      request_id: requestId,
+    });
+    if (videoJob) {
+      await convex.mutation(api.videos.updateVideoJobStatus, {
+        request_id: requestId,
+        status: data.status,
+        error_message: null,
+        video_url: null,
+      });
+    }
+  }
 
   // For any other statuses (e.g., queued, processing notifications)
   // optionally log or ignore them

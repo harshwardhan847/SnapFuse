@@ -51,6 +51,25 @@ export default defineSchema({
     updated_at: v.optional(v.string()),
     userId: v.string(),
   }).index("byUserId", ["userId"]),
+
+  videos: defineTable({
+    request_id: v.string(),
+    prompt: v.string(),
+    video_url: v.union(v.null(), v.string()),
+    input_storage_id: v.union(v.id("_storage"), v.null()),
+    duration: v.optional(v.string()),
+    negative_prompt: v.optional(v.string()),
+    cfg_scale: v.optional(v.number()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("processing"),
+      v.literal("done"),
+      v.literal("error")
+    ),
+    error_message: v.union(v.null(), v.string()),
+    updated_at: v.optional(v.string()),
+    userId: v.string(),
+  }).index("byUserId", ["userId"]),
 });
 
 export const MessageType = ["text", "image"] as const;

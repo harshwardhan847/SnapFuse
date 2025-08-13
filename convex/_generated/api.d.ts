@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as chats from "../chats.js";
 import type * as images from "../images.js";
+import type * as index from "../index.js";
 import type * as messages from "../messages.js";
 import type * as users from "../users.js";
 import type * as videos from "../videos.js";
@@ -30,6 +31,7 @@ import type * as videos from "../videos.js";
 declare const fullApi: ApiFromModules<{
   chats: typeof chats;
   images: typeof images;
+  index: typeof index;
   messages: typeof messages;
   users: typeof users;
   videos: typeof videos;
