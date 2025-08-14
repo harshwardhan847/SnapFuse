@@ -19,6 +19,7 @@ import {
 import { useQuery } from "convex/react";
 import { api } from "../../../../../../convex/_generated/api";
 import CopyText from "@/components/copy";
+import VideoFromImageToolPart from "./parts/video-from-image-tool-part";
 
 // Message part components
 const TextPart = ({ text }: { text: string }) => <Markdown>{text}</Markdown>;
@@ -149,17 +150,6 @@ const ProductImageGenerationPart = ({ part }: { part: any }) => {
     } catch {
       // ignore
     }
-  };
-
-  const downloadInputByStorageId = async (
-    storageId: string,
-    filename: string
-  ) => {
-    const url = await fetch(`/api/get-image-url?storageId=${storageId}`)
-      .then((res) => res.json())
-      .then((data) => data.url);
-    if (!url) return;
-    await downloadByUrl(url, filename);
   };
 
   return (
@@ -606,80 +596,220 @@ const PromptFromImageToolPart = ({ part }: { part: any }) => {
   );
 };
 
-const ImageGenerationToolPart = ({ part }: { part: any }) => {
+const PromptFromImageForVideoToolPart = ({ part }: { part: any }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const isProcessing = part.state === "processing" || part.state === "pending";
-  const hasError = part.state === "error" || part.output?.status === "failed";
-  const isComplete =
-    part.state === "done" && part.output?.status === "processing";
+  const hasError = part.state === "error";
+  const isReady = part.state === "output-available" || part.state === "done";
+
+  const inputStorageId: string | undefined = part.input?.inputStorageId;
+  const inputImageUrl = useQuery(
+    api.images.getStorageUrl,
+    inputStorageId ? { storageId: inputStorageId as any } : "skip"
+  );
+
+  const promptText: string | null =
+    typeof part.output === "string"
+      ? part.output
+      : typeof part.output?.text === "string"
+        ? part.output.text
+        : null;
 
   return (
-    <div className="p-4 bg-muted/50 rounded-lg">
-      <div className="flex items-center gap-2 mb-3">
-        <Badge variant="outline">Image Generation</Badge>
-        {isProcessing && <Loader className="h-4 w-4 animate-spin" />}
+    <>
+      <div className="p-4 bg-muted/50 rounded-lg">
+        <div className="flex items-center gap-2 mb-3">
+          <Badge variant="outline">Prompt from Image</Badge>
+          {isProcessing && <Loader className="h-4 w-4 animate-spin" />}
+        </div>
+
+        <div className="flex gap-4">
+          {/* Input Image */}
+          {inputStorageId && (
+            <div className="relative">
+              <div className="relative w-32 h-32 rounded-lg overflow-hidden">
+                {inputImageUrl ? (
+                  <Image
+                    src={inputImageUrl}
+                    alt="Input image"
+                    width={128}
+                    height={128}
+                    className={`object-cover w-full h-full ${
+                      isProcessing ? "blur-sm" : ""
+                    }`}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-muted/30 flex items-center justify-center">
+                    <Loader className="h-4 w-4 animate-spin" />
+                  </div>
+                )}
+                {isProcessing && (
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                    <Loader className="h-6 w-6 animate-spin text-white" />
+                  </div>
+                )}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1 text-center">
+                Input
+              </div>
+            </div>
+          )}
+
+          {/* Prompt Output */}
+          <div className="flex-1 min-w-0">
+            {hasError ? (
+              <div className="text-sm text-red-600">
+                Failed to generate prompt.
+              </div>
+            ) : isProcessing ? (
+              <div className="text-sm text-muted-foreground">
+                Generating prompt...
+              </div>
+            ) : isReady && promptText ? (
+              <div className="bg-background rounded-lg border p-3 relative">
+                <pre className="whitespace-pre-wrap break-words text-sm max-h-60 overflow-auto">
+                  {promptText}
+                </pre>
+                <div className="absolute top-2 right-2">
+                  <CopyText text={promptText} />
+                </div>
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                Waiting for output...
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Info Button */}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setIsModalOpen(true)}
+          className="mt-3"
+        >
+          <Info className="h-4 w-4 mr-2" />
+          View Details
+        </Button>
       </div>
 
-      {isProcessing && (
-        <div className="text-sm text-muted-foreground">
-          Generating your image... This may take a few moments.
-        </div>
-      )}
+      {/* Details Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>Prompt From Image - Details</DialogTitle>
+            <DialogDescription>
+              All inputs and the generated prompt
+            </DialogDescription>
+          </DialogHeader>
 
-      {hasError && (
-        <div className="text-sm text-red-600">
-          Error: {part.output?.error || "Failed to generate image"}
-        </div>
-      )}
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Input Section */}
+            <div className="space-y-4">
+              <h3 className="font-semibold">Input Image</h3>
+              {inputStorageId ? (
+                <div className="relative">
+                  {inputImageUrl ? (
+                    <Image
+                      src={inputImageUrl}
+                      alt="Input image"
+                      width={400}
+                      height={400}
+                      className="rounded-lg object-cover w-full"
+                    />
+                  ) : (
+                    <div className="bg-muted/30 rounded-lg h-64 flex items-center justify-center">
+                      <Loader className="h-6 w-6 animate-spin" />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground">
+                  No input image
+                </div>
+              )}
 
-      {isComplete && (
-        <div className="text-sm text-green-600">
-          Image generation started! Check your image gallery for the result.
-        </div>
-      )}
+              <div className="space-y-2">
+                <h4 className="font-medium">Input Parameters</h4>
+                <div className="bg-muted/50 p-3 rounded-lg text-sm">
+                  <pre className="whitespace-pre-wrap">
+                    {JSON.stringify(part.input, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            </div>
 
-      {part.output?.requestId && (
-        <div className="text-xs text-muted-foreground mt-2">
-          Request ID: {part.output.requestId}
-        </div>
-      )}
-    </div>
+            {/* Output Section */}
+            <div className="space-y-4">
+              <h3 className="font-semibold">Generated Prompt</h3>
+              {promptText ? (
+                <div className="relative bg-background rounded-lg border p-3">
+                  <pre className="whitespace-pre-wrap break-words text-sm max-h-[60vh] overflow-auto">
+                    {promptText}
+                  </pre>
+                  <div className="absolute top-2 right-2">
+                    <CopyText text={promptText} />
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-muted/30 rounded-lg h-64 flex items-center justify-center">
+                  <span className="text-muted-foreground">
+                    {isProcessing ? "Generating..." : "No prompt available"}
+                  </span>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <h4 className="font-medium">Status</h4>
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant={
+                      hasError
+                        ? "destructive"
+                        : isReady
+                          ? "default"
+                          : "secondary"
+                    }
+                  >
+                    {part.state}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
 const ToolPart = ({ part }: { part: any }) => {
-  // Handle specific tool types
-  if (part.type === "tool-generateSeoReadyContent") {
-    return (
-      <div className="w-full mt-4">
+  switch (part.type) {
+    case "tool-generateSeoReadyContent":
+      return (
         <SeoContent
           data={part.output as z.infer<typeof seoContentSchema> | null}
           isLoading={part.state !== "output-available"}
         />
-      </div>
-    );
+      );
+    case "tool-generateProductImageTool":
+      return <ProductImageGenerationPart part={part} />;
+    case "tool-generatePromptFromImageTool":
+      return <PromptFromImageToolPart part={part} />;
+    case "tool-generatePromptFromImageForVideoTool":
+      return <PromptFromImageForVideoToolPart part={part} />;
+    case "tool-generateVideoFromImageTool":
+      return <VideoFromImageToolPart part={part} />;
+    default:
+      return (
+        <div className="p-3 bg-muted/50 rounded-lg">
+          <Badge variant="outline">{part.type}</Badge>
+          <pre className="text-xs">{JSON.stringify(part, null, 2)}</pre>
+        </div>
+      );
   }
-
-  // Handle product image generation tool
-  if (part.type === "tool-generateProductImageTool") {
-    return <ProductImageGenerationPart part={part} />;
-  }
-
-  // Handle prompt from image tool
-  if (part.type === "tool-generatePromptFromImageTool") {
-    return <PromptFromImageToolPart part={part} />;
-  }
-
-  // Default tool fallback
-  return (
-    <div className="p-3 bg-muted/50 rounded-lg">
-      <Badge variant="outline" className="mb-2">
-        {part.type}
-      </Badge>
-      <pre className="text-xs overflow-auto">
-        {JSON.stringify(part, null, 2)}
-      </pre>
-    </div>
-  );
 };
 
 const MessagePart = ({ part }: { part: any }) => {
