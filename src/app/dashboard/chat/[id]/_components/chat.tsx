@@ -7,6 +7,7 @@ import {
   ChatInit,
   DefaultChatTransport,
   generateId,
+  lastAssistantMessageIsCompleteWithToolCalls,
   UIDataTypes,
   UIMessage,
   UITools,
@@ -32,7 +33,8 @@ const Chat = ({ chatId, initialMessages }: Props) => {
   const { userId } = useAuth();
   const addMessage = useMutation(api.messages.addMessage);
 
-  const { messages, sendMessage, status, stop } = useChat({
+  const { messages, sendMessage, status, stop, addToolResult } = useChat({
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     transport: new DefaultChatTransport({
       api: "/api/chat",
       headers: {
@@ -43,6 +45,16 @@ const Chat = ({ chatId, initialMessages }: Props) => {
       },
     }),
     messages: initialMessages,
+    // async onToolCall({ toolCall }) {
+    //   const result = await executeToolCall(toolCall.);
+
+    //   // Important: Don't await addToolResult inside onToolCall to avoid deadlocks
+    //   addToolResult({
+    //     tool: toolCall.toolName,
+    //     toolCallId: toolCall.toolCallId,
+    //     output: result,
+    //   });
+    // },
 
     onFinish: ({ message }) => {
       addMessage({

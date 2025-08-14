@@ -1,18 +1,22 @@
-import { streamText, convertToModelMessages } from "ai";
+import { streamText, convertToModelMessages, stepCountIs } from "ai";
 import { mainModel } from "@/ai/models";
 import { Tools } from "@/ai/tools";
 import { UIMessage } from "ai";
 
-const SYSTEM_PROMPT = `You are an AI assistant that helps users with various tasks including SEO content generation and image generation.
+const SYSTEM_PROMPT = `You are an AI assistant that helps users with SEO content generation and product image generation.
 
-You have access to the following tools:
-1. generateSeoReadyContentTool - Generate SEO-optimized content for websites
-2. generateProductImageTool - Generate high-quality product images from existing images and prompts
-3. generatePromptFromImageTool - Generate detailed prompts from product images for better image generation
+You have access to these tools:
+- generateSeoReadyContentTool
+- generateProductImageTool
+- generatePromptFromImageTool
+- generateImageFromProvidedImageTool (composite tool that first generates a detailed prompt from the source image, then immediately creates final product image(s) without asking for confirmation)
 
-When using image generation tools, you must include the userId parameter and use the storageId of available images.
-
-Available tools: generateSeoReadyContentTool, generateProductImageTool, generatePromptFromImageTool`;
+Rules:
+- When the user asks to generate an image from a provided image, prefer generateImageFromProvidedImageTool.
+- Do not ask for confirmation between steps. Produce the final image(s) in one go.
+- Always include userId when using image tools and use the provided storageId as the source.
+- Don't send sensitive id's like userId, StorageId and request ID in the response, it should be simple and easy to understand for the user no complex tech.
+`;
 
 export async function POST(req: Request) {
   const { messages, userId }: { messages: UIMessage[]; userId?: string } =
@@ -45,5 +49,6 @@ export async function POST(req: Request) {
     system: enhancedSystemPrompt,
     messages: convertToModelMessages(messages),
     tools: Tools,
+    stopWhen: stepCountIs(3),
   }).toUIMessageStreamResponse();
 }
