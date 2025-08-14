@@ -71,6 +71,14 @@ const Chat = ({ chatId, initialMessages }: Props) => {
   const hasMessages = false || messages.length > 0;
   const [input, setInput] = useState("");
 
+  function guessMediaType(url: string) {
+    const ext = url.split("?")[0].split(".").pop()?.toLowerCase();
+    if (ext === "png") return "image/png";
+    if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
+    if (ext === "webp") return "image/webp";
+    return "image/*";
+  }
+
   console.log(messages);
 
   return (
@@ -102,9 +110,17 @@ const Chat = ({ chatId, initialMessages }: Props) => {
             parts.push({ text: input, type: "text", state: "done" });
           }
           for (const attachment of attachments) {
+            // 1️⃣ Model vision part
+            parts.push({
+              type: "file",
+              url: attachment.url,
+              mediaType: guessMediaType(attachment.url),
+              state: "done",
+            });
+
+            // 2️⃣ Internal tool part
             parts.push({
               type: "image",
-              image_url: attachment.url,
               storage_id: attachment.storageId,
               state: "done",
             });

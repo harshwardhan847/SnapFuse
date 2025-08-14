@@ -13,14 +13,17 @@ You are an autonomous AI assistant for SEO content and product image generation.
 
 Available tools:
 - generateSeoReadyContentTool
-- generateProductImageTool
 - generatePromptFromImageTool
-- generateImageFromProvidedImageTool
+- generateProductImageTool
+- generateVideoFromImageTool
+- generatePromptFromImageForVideoTool
 
 Critical rules:
-- If the user requests generating an image from a provided image, prefer generateImageFromProvidedImageTool.
-- Do not ask for confirmation between steps; produce final images in one go.
-- Always include userId when calling any image tool.
+- Don't say anything similar to this "I'm generating your image now, this may take a moment. I will notify you when it's complete."
+- don't commit to notify on completion of image or video generation.
+- If the user requests generating an image from a provided image, generate prompt from generatePromptFromImageTool and then pass the prompt to generateProductImageTool for generating image.
+- Do not ask for confirmation between steps; produce final images or video in one go.
+- Always include userId when calling any image tool or video tool.
 - When using provided images, always include the provided storageId for the source.
 - Do not reveal internal identifiers (userId, storageId, request IDs) in user-visible responses. These may be used as tool parameters, but must not appear in the message content.
 - Keep responses simple, helpful, and non-technical from the user's perspective; avoid exposing tool orchestration details.
@@ -28,7 +31,8 @@ Critical rules:
 - If the user asks to redo/iterate "with same image," reuse the most recent image unless a new one is provided.
 
 Tool-calling guidance:
-- For generateImageFromProvidedImageTool: pass { userId, storageId, ...user-requested options } in a single call. The tool should internally generate a descriptive prompt from the source image and return final images.
+- For generateProductImageTool: pass { userId, storageId, ...user-requested options } in a single call. The tool should internally generate a descriptive prompt from the source image and return final images.
+- For generateVideoFromImageTool: pass { userId, storageId, ...user-requested options } in a single call. The tool should internally generate a descriptive prompt from the source image and return final Video.
 - For SEO content tasks, use generateSeoReadyContentTool with parameters derived from the user’s brief; avoid extraneous follow-ups unless truly necessary.
 
 Privacy:
@@ -59,24 +63,6 @@ function extractRecentStorageIds(messages: UIMessage[], limit = 5): string[] {
   }
   // Keep unique, latest-first
   return Array.from(new Set(ids.reverse())).reverse();
-}
-
-// Optionally detect if user asked to use a provided image
-function userRequestedImageFromProvidedImage(messages: UIMessage[]): boolean {
-  const last = messages
-    .slice()
-    .reverse()
-    .find((m) => m.role === "user");
-  const text = (last?.parts?.map((part) => (part as any)?.text ?? "") ?? [])
-    .join(" ")
-    .toLowerCase();
-  // simple heuristics; you can refine with an LLM function or regex
-  return (
-    /\b(use|from|based on)\b.*\b(image|photo|pic|upload)\b/.test(text) ||
-    /\bedit\b.*\bimage\b/.test(text) ||
-    /\bgenerate\b.*\bfrom .*image\b/.test(text) ||
-    /\buse the image\b/.test(text)
-  );
 }
 
 /**
@@ -118,7 +104,6 @@ export async function POST(req: Request) {
 
   if (recentStorageIds.length > 0) {
     enhancedSystemPrompt += `
-
 Conversation images available (internal use only):
 ${recentStorageIds.map((id, i) => `- Image ${i + 1}: storageId=${id}`).join("\n")}
 Note: Do not expose these IDs to the user in responses.`;
@@ -140,20 +125,17 @@ Warning: userId missing. If calling image tools, request user to authenticate or
   }
 
   // Auto-wire tool preference: if the user asked to use their image and we have one, nudge the model to use composite tool.
-  const hintForComposite =
-    userRequestedImageFromProvidedImage(messages) && latestStorageId && userId
-      ? `
+  const hintForComposite = `
 When generating from a provided image now, call generateImageFromProvidedImageTool exactly once with:
 { userId: "${userId}", storageId: "${latestStorageId}" }
-Do not ask for confirmation; produce final images.`
-      : "";
+Do not ask for confirmation; produce final images.`;
 
   enhancedSystemPrompt += hintForComposite;
 
   // Hard stop control for tool-chaining; increase if you allow deeper plans
   const maxSteps = 4;
 
-  const response = await streamText({
+  const response = streamText({
     model: mainModel,
     system: enhancedSystemPrompt,
     messages: modelMessages,
