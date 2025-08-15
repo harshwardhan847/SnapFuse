@@ -1,16 +1,8 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import React, { useMemo, useState } from "react";
 import { api } from "../../../../../convex/_generated/api";
-import { usePagination } from "@/hooks/use-pagination";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { format } from "date-fns";
 
 import {
@@ -50,26 +42,21 @@ const statusClasses: { [key: string]: string } = {
 const ImageList = ({ userId }: Props) => {
   const { isPremium } = usePlan();
   const router = useRouter();
-  const pagination = usePagination({ itemsPerPage: 12 });
 
-  // Use offset-based pagination
-  const offset = (pagination.currentPage - 1) * pagination.itemsPerPage;
-  const paginatedImagesOffset = useQuery(api.images.getImagesByUserIdOffset, {
-    userId,
-    offset,
-    limit: pagination.itemsPerPage,
-  });
-
-  // Get total count for display
-  const totalCount = paginatedImagesOffset?.total;
+  // Use proper Convex pagination
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.images.getImagesByUserIdPaginated,
+    { userId },
+    { initialNumItems: 12 }
+  );
 
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const selectedImage = useMemo(() => {
-    if (!paginatedImagesOffset?.images || selectedIndex === null) return null;
-    return paginatedImagesOffset.images[selectedIndex];
-  }, [paginatedImagesOffset?.images, selectedIndex]);
+    if (!results || selectedIndex === null) return null;
+    return results[selectedIndex];
+  }, [results, selectedIndex]);
 
   // Resolve the input image URL (stored in Convex storage) for the selected item
   // Passing undefined to useQuery will skip the subscription until we have a storage id
@@ -117,7 +104,7 @@ const ImageList = ({ userId }: Props) => {
     router.push("/dashboard/video?openModal=true");
   }
 
-  if (!paginatedImagesOffset || totalCount === undefined) {
+  if (status === "LoadingFirstPage") {
     return (
       <div className="flex justify-center py-20">
         <Loader className="animate-spin" />
@@ -125,7 +112,7 @@ const ImageList = ({ userId }: Props) => {
     );
   }
 
-  if (totalCount === 0) {
+  if (results.length === 0) {
     return (
       <div className="flex justify-center py-20">
         <Label className="text-gray-500">No images found.</Label>
@@ -133,24 +120,17 @@ const ImageList = ({ userId }: Props) => {
     );
   }
 
-  const images = paginatedImagesOffset.images;
-  const hasNextPage = paginatedImagesOffset.hasMore;
-  const hasPreviousPage = pagination.currentPage > 1;
-
   return (
     <>
       {/* Pagination Info */}
       <div className="flex items-center justify-between mb-4">
         <div className="text-sm text-muted-foreground">
-          Showing {images.length} of {totalCount} images
-          {totalCount > pagination.itemsPerPage && (
-            <span className="ml-2">(Page {pagination.currentPage})</span>
-          )}
+          Showing {results.length} images
         </div>
       </div>
 
       <div className="grid gap-6 mt-4 sm:grid-cols-2 lg:grid-cols-3 w-full">
-        {images.map((image: Doc<"images">, index: number) => {
+        {results.map((image: Doc<"images">, index: number) => {
           const status = (image.status || "").toLowerCase();
           const badgeClass =
             statusClasses[status] || "bg-muted text-foreground";
@@ -255,50 +235,23 @@ const ImageList = ({ userId }: Props) => {
         })}
       </div>
 
-      {/* Pagination Controls */}
-      {totalCount > pagination.itemsPerPage && (
-        <div className="mt-8">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  size="default"
-                  onClick={() => {
-                    if (hasPreviousPage) {
-                      pagination.goToPage(pagination.currentPage - 1);
-                    }
-                  }}
-                  className={
-                    !hasPreviousPage
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
-                  }
-                />
-              </PaginationItem>
-
-              <PaginationItem>
-                <span className="flex h-9 items-center justify-center px-4 text-sm">
-                  Page {pagination.currentPage}
-                </span>
-              </PaginationItem>
-
-              <PaginationItem>
-                <PaginationNext
-                  size="default"
-                  onClick={() => {
-                    if (hasNextPage) {
-                      pagination.goToPage(pagination.currentPage + 1);
-                    }
-                  }}
-                  className={
-                    !hasNextPage
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+      {/* Load More Button */}
+      {(status === "CanLoadMore" || status === "LoadingMore") && (
+        <div className="mt-8 flex justify-center">
+          <Button
+            onClick={() => loadMore(12)}
+            disabled={status === "LoadingMore"}
+            variant="outline"
+          >
+            {status === "LoadingMore" ? (
+              <>
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              "Load More"
+            )}
+          </Button>
         </div>
       )}
 

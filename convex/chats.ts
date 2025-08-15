@@ -1,3 +1,4 @@
+import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
 import { query, mutation } from "./_generated/server";
 
@@ -56,3 +57,30 @@ export const deleteChat = mutation(
     return await db.delete(chatId);
   }
 );
+
+/**
+ * Get chats for a user with proper cursor-based pagination
+ */
+export const getChatsByUserPaginated = query({
+  args: {
+    userId: v.string(),
+    paginationOpts: v.object({
+      numItems: v.number(),
+      cursor: v.union(v.string(), v.null()),
+      id: v.number(),
+    }),
+  },
+  handler: async (ctx, { userId, paginationOpts }) => {
+    // Extract only the valid pagination options to avoid extra fields
+    const validPaginationOpts = {
+      numItems: paginationOpts.numItems,
+      cursor: paginationOpts.cursor,
+    };
+
+    return await ctx.db
+      .query("chats")
+      .withIndex("byUserId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .paginate(validPaginationOpts);
+  },
+});

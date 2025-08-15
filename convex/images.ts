@@ -132,6 +132,7 @@ export const getImagesByUserIdPaginated = query({
     paginationOpts: v.object({
       numItems: v.number(),
       cursor: v.union(v.string(), v.null()),
+      id: v.number(),
     }),
   },
   handler: async (ctx, { userId, paginationOpts }) => {
