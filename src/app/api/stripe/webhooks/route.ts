@@ -13,9 +13,20 @@ import {
 import { api } from "../../../../../convex/_generated/api";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
+// Helper to get a buffer from the request
+async function buffer(readable: ReadableStream<Uint8Array>) {
+  const reader = readable.getReader();
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  return Buffer.concat(chunks);
+}
 export async function POST(req: NextRequest) {
-  const body = await req.text();
+  const bodyBuffer = await buffer(req.body as ReadableStream<Uint8Array>);
+
   const signature = (await headers()).get("stripe-signature");
 
   if (!signature) {
@@ -35,7 +46,7 @@ export async function POST(req: NextRequest) {
 
   try {
     event = stripe.webhooks.constructEvent(
-      body,
+      bodyBuffer,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
