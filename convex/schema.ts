@@ -38,7 +38,7 @@ export default defineSchema({
   // Stripe payment records
   payments: defineTable({
     userId: v.string(),
-    stripePaymentIntentId: v.union(v.string(), v.null()),
+    stripePaymentIntentId: v.optional(v.union(v.string(), v.null())),
     stripeSessionId: v.optional(v.string()),
     amount: v.number(), // Amount in cents
     currency: v.string(),

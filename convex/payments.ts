@@ -200,7 +200,7 @@ export const getCreditHistory = query({
 export const recordPayment = mutation({
   args: {
     userId: v.string(),
-    stripePaymentIntentId: v.union(v.string(), v.null()),
+    stripePaymentIntentId: v.optional(v.union(v.string(), v.null())),
     stripeSessionId: v.optional(v.string()),
     amount: v.number(),
     currency: v.string(),
