@@ -33,12 +33,17 @@ export async function POST(request: NextRequest) {
         {
           error: "Insufficient credits",
           currentCredits: userCredits.currentCredits,
-          requiredCredits: 5
+          requiredCredits: 5,
         },
         { status: 402 } // Payment Required
       );
     }
-
+    if (!inputStorageId) {
+      return NextResponse.json(
+        { error: "Image not provided" },
+        { status: 404 }
+      );
+    }
     // Get the image URL from the storage ID if provided
     let imageUrl = null;
     if (inputStorageId) {
@@ -50,19 +55,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Image not found" }, { status: 404 });
       }
     }
-
-    const requestId = `vid_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-
-    // Create video job record (this will deduct credits automatically)
-    await convex.mutation(api.videos.createVideoJobRecord, {
-      prompt,
-      request_id: requestId,
-      input_storage_id: inputStorageId || null,
-      userId,
-      duration,
-      negative_prompt,
-      cfg_scale,
-    });
 
     // Submit to FAL AI for processing
     const { request_id } = await fal.queue.submit(
@@ -79,21 +71,22 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Update the request ID if different from what we generated
-    if (request_id !== requestId) {
-      await convex.mutation(api.videos.updateVideoJobStatus, {
-        request_id: requestId,
-        status: "processing",
-        video_url: null,
-        error_message: null,
-      });
-    }
+    // Create video job record (this will deduct credits automatically)
+    await convex.mutation(api.videos.createVideoJobRecord, {
+      prompt,
+      request_id,
+      input_storage_id: inputStorageId || null,
+      userId,
+      duration,
+      negative_prompt,
+      cfg_scale,
+    });
 
     return NextResponse.json({
       status: "processing",
       requestId: request_id,
       creditsDeducted: 5,
-      remainingCredits: userCredits.currentCredits - 5
+      remainingCredits: userCredits.currentCredits - 5,
     });
   } catch (error: any) {
     console.error("Video generation error:", error);

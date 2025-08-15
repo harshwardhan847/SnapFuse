@@ -26,13 +26,19 @@ export async function POST(request: NextRequest) {
         {
           error: "Insufficient credits",
           currentCredits: userCredits.currentCredits,
-          requiredCredits: 1
+          requiredCredits: 1,
         },
         { status: 402 } // Payment Required
       );
     }
 
     // Get the image URL from the storage ID if provided
+    if (!inputStorageId) {
+      return NextResponse.json(
+        { error: "Image not provided" },
+        { status: 404 }
+      );
+    }
     let imageUrl = null;
     if (inputStorageId) {
       imageUrl = await convex.query(api.images.getStorageUrl, {
@@ -44,41 +50,29 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const requestId = `img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    // Submit to FAL AI for processing
+    const { request_id } = await fal.queue.submit("fal-ai/flux-kontext/dev", {
+      input: {
+        prompt,
+        image_url: imageUrl,
+      },
+      webhookUrl: `${process.env.APP_BASE_URL}/api/webhooks/falai`,
+    });
 
     // Create image job record (this will deduct credits automatically)
     await convex.mutation(api.images.createImageJobRecord, {
       image_url: null,
       prompt,
-      request_id: requestId,
+      request_id,
       input_storage_id: inputStorageId || null,
       userId,
     });
-
-    // Submit to FAL AI for processing
-    const { request_id } = await fal.queue.submit("fal-ai/flux-kontext/dev", {
-      input: {
-        prompt,
-        image_url: imageUrl
-      },
-      webhookUrl: `${process.env.APP_BASE_URL}/api/webhooks/falai`,
-    });
-
-    // Update the request ID if different from what we generated
-    if (request_id !== requestId) {
-      await convex.mutation(api.images.updateImageJobStatus, {
-        request_id: requestId,
-        status: "processing",
-        image_url: null,
-        error_message: null,
-      });
-    }
 
     return NextResponse.json({
       status: "processing",
       requestId: request_id,
       creditsDeducted: 1,
-      remainingCredits: userCredits.currentCredits - 1
+      remainingCredits: userCredits.currentCredits - 1,
     });
   } catch (error: any) {
     console.error("Image generation error:", error);
