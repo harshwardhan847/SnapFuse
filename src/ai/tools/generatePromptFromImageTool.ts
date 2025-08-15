@@ -78,7 +78,7 @@ export const generatePromptFromImageTool: Tool = {
     try {
       const baseUrl =
         process.env.APP_BASE_URL ||
-        process.env.NEXT_PUBLIC_APP_URL ||
+        process.env.APP_BASE_URL ||
         "http://localhost:3000";
 
       // Step 1: Get the image data URL from storage ID (absolute URL required on server)

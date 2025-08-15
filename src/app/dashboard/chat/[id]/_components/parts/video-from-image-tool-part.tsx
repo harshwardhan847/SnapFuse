@@ -1,6 +1,6 @@
 import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
-import { api } from "../../../../../../../convex";
+import { api } from "../../../../../../../convex/_generated/api";
 import { Download, Info, Loader } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -92,9 +92,8 @@ const VideoFromImageToolPart = ({ part }: { part: any }) => {
                     alt={"generated Image"}
                     width={128}
                     height={128}
-                    className={`object-cover w-full h-full ${
-                      derivedProcessing ? "blur-sm" : ""
-                    }`}
+                    className={`object-cover w-full h-full ${derivedProcessing ? "blur-sm" : ""
+                      }`}
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">

@@ -10,7 +10,45 @@ export default defineSchema({
     last_name: v.optional(v.string()),
     image_url: v.optional(v.string()),
     updated_at: v.optional(v.string()),
-  }).index("byExternalId", ["externalId"]),
+    // Payment and credits fields
+    credits: v.optional(v.number()), // Current available credits
+    subscriptionPlan: v.optional(v.string()), // free, starter, pro, enterprise
+    stripeCustomerId: v.optional(v.string()),
+    stripeSubscriptionId: v.optional(v.string()),
+    subscriptionStatus: v.optional(v.string()), // active, canceled, past_due, etc.
+    subscriptionPeriodEnd: v.optional(v.number()), // Unix timestamp
+  }).index("byExternalId", ["externalId"])
+    .index("byStripeCustomerId", ["stripeCustomerId"])
+    .index("byStripeSubscriptionId", ["stripeSubscriptionId"]),
+
+  // Credit transactions for tracking usage
+  creditTransactions: defineTable({
+    userId: v.string(),
+    type: v.union(v.literal("debit"), v.literal("credit")), // debit = used, credit = added
+    amount: v.number(),
+    reason: v.string(), // "image_generation", "video_generation", "subscription_renewal", "topup", etc.
+    relatedId: v.optional(v.string()), // ID of related image/video/subscription
+    balanceAfter: v.number(), // Credits balance after this transaction
+    createdAt: v.number(), // Unix timestamp
+  }).index("byUserId", ["userId"])
+    .index("byUserIdAndCreatedAt", ["userId", "createdAt"]),
+
+  // Stripe payment records
+  payments: defineTable({
+    userId: v.string(),
+    stripePaymentIntentId: v.string(),
+    stripeSessionId: v.optional(v.string()),
+    amount: v.number(), // Amount in cents
+    currency: v.string(),
+    status: v.string(), // succeeded, pending, failed, etc.
+    type: v.union(v.literal("subscription"), v.literal("topup")),
+    planId: v.optional(v.string()), // For subscriptions
+    creditsAdded: v.optional(v.number()), // For topups
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("byUserId", ["userId"])
+    .index("byStripePaymentIntentId", ["stripePaymentIntentId"])
+    .index("byStripeSessionId", ["stripeSessionId"]),
 
   chats: defineTable({
     title: v.string(),

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 
 export const createVideoJobRecord = mutation({
   args: {
@@ -23,6 +24,29 @@ export const createVideoJobRecord = mutation({
       cfg_scale,
     }
   ) => {
+    // Check if user has sufficient credits (5 credits for video generation)
+    const user = await ctx.db
+      .query("users")
+      .withIndex("byExternalId", (q) => q.eq("externalId", userId))
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const currentCredits = user.credits || 0;
+    if (currentCredits < 5) {
+      throw new Error("Insufficient credits for video generation");
+    }
+
+    // Deduct credits first
+    await ctx.scheduler.runAfter(0, internal.payments.deductCreditsInternal, {
+      userId,
+      amount: 5,
+      reason: "video_generation",
+      relatedId: request_id,
+    });
+
     const now = new Date();
     await ctx.db.insert("videos", {
       request_id,

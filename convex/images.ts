@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 
 export const createImageJobRecord = mutation({
   args: {
@@ -13,6 +14,29 @@ export const createImageJobRecord = mutation({
     ctx,
     { request_id, prompt, image_url = null, input_storage_id = null, userId }
   ) => {
+    // Check if user has sufficient credits (1 credit for image generation)
+    const user = await ctx.db
+      .query("users")
+      .withIndex("byExternalId", (q) => q.eq("externalId", userId))
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const currentCredits = user.credits || 0;
+    if (currentCredits < 1) {
+      throw new Error("Insufficient credits for image generation");
+    }
+
+    // Deduct credits first
+    await ctx.scheduler.runAfter(0, internal.payments.deductCreditsInternal, {
+      userId,
+      amount: 1,
+      reason: "image_generation",
+      relatedId: request_id,
+    });
+
     const now = new Date();
     await ctx.db.insert("images", {
       request_id,
