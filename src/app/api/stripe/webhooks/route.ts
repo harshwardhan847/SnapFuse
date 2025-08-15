@@ -13,21 +13,10 @@ import {
 import { api } from "../../../../../convex/_generated/api";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-// Helper to get a buffer from the request
-async function buffer(readable: ReadableStream<Uint8Array>) {
-  const reader = readable.getReader();
-  const chunks = [];
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-  }
-  return Buffer.concat(chunks);
-}
-export async function POST(req: NextRequest) {
-  const bodyBuffer = await buffer(req.body as ReadableStream<Uint8Array>);
 
+export async function POST(req: NextRequest) {
   const signature = (await headers()).get("stripe-signature");
+  console.log(signature);
 
   if (!signature) {
     console.error("No Stripe signature found in request headers");
@@ -46,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   try {
     event = stripe.webhooks.constructEvent(
-      bodyBuffer,
+      await req.text(),
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
