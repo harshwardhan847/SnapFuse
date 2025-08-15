@@ -22,7 +22,7 @@ export default function Page() {
   } = usePaginatedQuery(
     api.messages.getMessagesPaginated,
     { sessionId: params?.id },
-    { initialNumItems: 10 }
+    { initialNumItems: 30 }
   );
 
   // Redirect non-premium users to chat page (which will show upgrade prompt)
@@ -78,7 +78,7 @@ export default function Page() {
       }
       onLoadMore={() => {
         console.log("Load more triggered");
-        loadMore(3);
+        loadMore(30);
       }}
       canLoadMore={status === "CanLoadMore"}
       isLoadingMore={status === "LoadingMore"}

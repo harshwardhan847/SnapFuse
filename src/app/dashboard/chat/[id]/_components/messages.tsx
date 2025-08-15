@@ -171,8 +171,9 @@ const ProductImageGenerationPart = ({ part }: { part: any }) => {
                     alt="Input image"
                     width={128}
                     height={128}
-                    className={`object-cover w-full h-full ${derivedProcessing ? "blur-sm" : ""
-                      }`}
+                    className={`object-cover w-full h-full ${
+                      derivedProcessing ? "blur-sm" : ""
+                    }`}
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">
@@ -445,8 +446,9 @@ const PromptFromImageToolPart = ({ part }: { part: any }) => {
                     alt="Input image"
                     width={128}
                     height={128}
-                    className={`object-cover w-full h-full ${isProcessing ? "blur-sm" : ""
-                      }`}
+                    className={`object-cover w-full h-full ${
+                      isProcessing ? "blur-sm" : ""
+                    }`}
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">
@@ -633,8 +635,9 @@ const PromptFromImageForVideoToolPart = ({ part }: { part: any }) => {
                     alt="Input image"
                     width={128}
                     height={128}
-                    className={`object-cover w-full h-full ${isProcessing ? "blur-sm" : ""
-                      }`}
+                    className={`object-cover w-full h-full ${
+                      isProcessing ? "blur-sm" : ""
+                    }`}
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">
@@ -828,14 +831,16 @@ const MessageBubble = ({ message }: { message: UIMessage }) => {
 
   return (
     <div
-      className={`flex items-start mb-4 ${isUser ? "justify-end" : "justify-start"
-        }`}
+      className={`flex items-start mb-4 ${
+        isUser ? "justify-end" : "justify-start"
+      }`}
     >
       <Card
-        className={`max-w-3xl w-full ${isUser
-          ? "bg-primary text-primary-foreground"
-          : "bg-card text-card-foreground"
-          }`}
+        className={`max-w-3xl w-full ${
+          isUser
+            ? "bg-primary text-primary-foreground"
+            : "bg-card text-card-foreground"
+        }`}
       >
         <CardContent className="p-4">
           <div className="flex flex-col gap-3">
@@ -864,13 +869,58 @@ const MessagesList = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   const [hasTriggeredLoad, setHasTriggeredLoad] = useState(false);
+  const [previousMessageCount, setPreviousMessageCount] = useState(0);
+  const [scrollPositionBeforeLoad, setScrollPositionBeforeLoad] = useState<
+    number | null
+  >(null);
+  const [previousScrollHeight, setPreviousScrollHeight] = useState(0);
+  const [isInitialRender, setIsInitialRender] = useState(true);
 
-  // Scroll to bottom when new messages arrive (but not when loading older messages)
+  // Handle scroll position preservation when loading older messages
   useEffect(() => {
-    if (shouldScrollToBottom && messages.length > 0) {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    // Initial render - always scroll to bottom
+    if (isInitialRender && messages.length > 0) {
+      setTimeout(() => {
+        messageEndRef.current?.scrollIntoView({ behavior: "instant" });
+        setIsInitialRender(false);
+      }, 100);
+      setPreviousMessageCount(messages.length);
+      return;
+    }
+
+    // If we just loaded more messages (count increased but we're not at bottom)
+    if (
+      messages.length > previousMessageCount &&
+      scrollPositionBeforeLoad !== null
+    ) {
+      // Calculate how much the content height increased
+      const currentScrollHeight = scrollContainer.scrollHeight;
+      const heightDifference = currentScrollHeight - previousScrollHeight;
+
+      // Restore scroll position by adding the height difference
+      scrollContainer.scrollTop = scrollPositionBeforeLoad + heightDifference;
+
+      // Reset the stored position
+      setScrollPositionBeforeLoad(null);
+      setPreviousScrollHeight(0);
+    }
+    // Only auto-scroll to bottom for new messages when user is near bottom
+    else if (messages.length > previousMessageCount && shouldScrollToBottom) {
       messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages.length, shouldScrollToBottom]);
+
+    setPreviousMessageCount(messages.length);
+  }, [
+    messages.length,
+    previousMessageCount,
+    scrollPositionBeforeLoad,
+    previousScrollHeight,
+    shouldScrollToBottom,
+    isInitialRender,
+  ]);
 
   // Handle scroll events to detect when user scrolls to top
   useEffect(() => {
@@ -884,15 +934,20 @@ const MessagesList = ({
       const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
       setShouldScrollToBottom(isNearBottom);
 
-      // Check if user scrolled to the top and can load more
+      // Check if user scrolled near the top and can load more (increased distance for better UX)
       if (
-        scrollTop < 100 &&
+        scrollTop < 300 &&
         canLoadMore &&
         !isLoadingMore &&
         !hasTriggeredLoad &&
         onLoadMore
       ) {
         console.log("Loading more messages...");
+
+        // Store current scroll position and height before loading
+        setScrollPositionBeforeLoad(scrollTop);
+        setPreviousScrollHeight(scrollHeight);
+
         setHasTriggeredLoad(true);
         onLoadMore();
         // Reset the trigger after a delay
