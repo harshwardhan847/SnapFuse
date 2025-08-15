@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { usePlan } from "@/hooks/use-plan";
+import { useSearchParams, useRouter } from "next/navigation";
 import VideoGenerationModal from "./_components/video-generation-modal";
 import VideoList from "./_components/video-list";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,19 @@ import Link from "next/link";
 const VideoPage = () => {
   const { user } = useUser();
   const { isPremium, planName, isLoading } = usePlan();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [openModal, setOpenModal] = useState(false);
+
+  // Check if modal should be opened from URL params
+  useEffect(() => {
+    const shouldOpenModal = searchParams.get('openModal') === 'true';
+    if (shouldOpenModal && isPremium) {
+      setOpenModal(true);
+      // Clean up URL
+      router.replace('/dashboard/video', { scroll: false });
+    }
+  }, [searchParams, isPremium, router]);
 
   if (!user) {
     return (
@@ -109,7 +123,11 @@ const VideoPage = () => {
             Transform your images into dynamic videos using AI
           </p>
         </div>
-        <VideoGenerationModal userId={user.id} />
+        <VideoGenerationModal
+          userId={user.id}
+          openModal={openModal}
+          onModalClose={() => setOpenModal(false)}
+        />
       </div>
 
       <VideoList userId={user.id} />

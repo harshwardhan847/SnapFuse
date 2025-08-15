@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -33,10 +33,12 @@ import Image from "next/image";
 
 type Props = {
   userId: string;
+  openModal?: boolean;
+  onModalClose?: () => void;
 };
 
-const VideoGenerationModal = ({ userId }: Props) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+const VideoGenerationModal = ({ userId, openModal = false, onModalClose }: Props) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(openModal);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -69,6 +71,50 @@ const VideoGenerationModal = ({ userId }: Props) => {
     resolver: zodResolver(formSchema),
     defaultValues: { imageUrl: "", prompt: "" },
   });
+
+  // Handle external modal opening and pre-filled data
+  useEffect(() => {
+    if (openModal) {
+      setIsDialogOpen(true);
+
+      // Check for pre-filled image data from sessionStorage
+      const storedImageData = sessionStorage.getItem('videoGenerationImage');
+      if (storedImageData) {
+        try {
+          const imageData = JSON.parse(storedImageData);
+
+          // Set form values
+          if (imageData.imageUrl) {
+            form.setValue('imageUrl', imageData.imageUrl);
+            setPreviewUrl(imageData.imageUrl);
+          }
+
+          if (imageData.storageId) {
+            setInputStorageId(imageData.storageId);
+          }
+
+          if (imageData.prompt) {
+            // Generate a video-specific prompt based on the image prompt
+            const videoPrompt = `Create a dynamic video animation of: ${imageData.prompt}. Add smooth motion and cinematic effects.`;
+            form.setValue('prompt', videoPrompt);
+          }
+
+          // Clear the stored data
+          sessionStorage.removeItem('videoGenerationImage');
+        } catch (error) {
+          console.error('Error parsing stored image data:', error);
+        }
+      }
+    }
+  }, [openModal, form]);
+
+  // Handle modal close
+  const handleModalClose = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open && onModalClose) {
+      onModalClose();
+    }
+  };
 
   async function generateVideo(imageUrl: string, prompt: string) {
     // Check credits before processing
@@ -213,7 +259,7 @@ const VideoGenerationModal = ({ userId }: Props) => {
   }
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog open={isDialogOpen} onOpenChange={handleModalClose}>
       <DialogTrigger asChild className="self-end">
         <Button>
           <Video className="mr-2 h-4 w-4" />

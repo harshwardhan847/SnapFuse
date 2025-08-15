@@ -14,7 +14,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Download, Loader } from "lucide-react";
+import { Download, Loader, Video } from "lucide-react";
+import { usePlan } from "@/hooks/use-plan";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -41,6 +43,8 @@ const ImageList = ({ userId }: Props) => {
   const images = useQuery(api.images.getAllImagesByUserId, {
     userId,
   });
+  const { isPremium } = usePlan();
+  const router = useRouter();
 
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -74,6 +78,26 @@ const ImageList = ({ userId }: Props) => {
     } catch {
       // ignore
     }
+  }
+
+  function handleGenerateVideo(image: Doc<"images">) {
+    if (!isPremium) {
+      // Redirect to pricing if not premium
+      router.push('/pricing');
+      return;
+    }
+
+    // Store image data in sessionStorage to pass to video generation
+    const imageData = {
+      imageUrl: image.image_url,
+      storageId: image.input_storage_id,
+      prompt: image.prompt,
+    };
+
+    sessionStorage.setItem('videoGenerationImage', JSON.stringify(imageData));
+
+    // Navigate to video page with a flag to open the modal
+    router.push('/dashboard/video?openModal=true');
   }
 
   if (!images) {
@@ -179,6 +203,20 @@ const ImageList = ({ userId }: Props) => {
                   >
                     View
                   </Button>
+                  {image.image_url && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleGenerateVideo(image);
+                      }}
+                      className="gap-1"
+                    >
+                      <Video className="h-3 w-3" />
+                      {isPremium ? 'Video' : 'Pro'}
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -285,7 +323,7 @@ const ImageList = ({ userId }: Props) => {
                   <div className="rounded-md border bg-muted/20 p-3 text-sm max-h-48 overflow-auto whitespace-pre-wrap">
                     {selectedImage.prompt}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <Button
                       size="sm"
                       variant="outline"
@@ -294,7 +332,7 @@ const ImageList = ({ userId }: Props) => {
                           await navigator.clipboard.writeText(
                             selectedImage.prompt || ""
                           );
-                        } catch {}
+                        } catch { }
                       }}
                     >
                       Copy Prompt
@@ -302,6 +340,7 @@ const ImageList = ({ userId }: Props) => {
                     {selectedImage.image_url && (
                       <Button
                         size="sm"
+                        variant="outline"
                         onClick={() =>
                           window.open(
                             selectedImage.image_url as string,
@@ -310,6 +349,20 @@ const ImageList = ({ userId }: Props) => {
                         }
                       >
                         Open Original
+                      </Button>
+                    )}
+                    {selectedImage.image_url && (
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={() => {
+                          setIsViewerOpen(false);
+                          handleGenerateVideo(selectedImage);
+                        }}
+                        className="gap-1"
+                      >
+                        <Video className="h-3 w-3" />
+                        {isPremium ? 'Generate Video' : 'Upgrade for Video'}
                       </Button>
                     )}
                   </div>
