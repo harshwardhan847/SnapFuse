@@ -28,6 +28,8 @@ import {
   MessagesSquare,
   Zap,
   CreditCard,
+  Lock,
+  Crown,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import {
@@ -40,16 +42,44 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCredits } from "@/hooks/use-credits";
+import { usePlan } from "@/hooks/use-plan";
 import { Badge } from "@/components/ui/badge";
 
 const menuItems = [
-  { title: "Home", icon: LayoutDashboard, href: "/dashboard/home" },
-  { title: "Chats", icon: MessagesSquare, href: "/dashboard/chat" },
+  {
+    title: "Home",
+    icon: LayoutDashboard,
+    href: "/dashboard/home",
+    planRequired: null,
+  },
+  { title: "SEO", icon: Activity, href: "/dashboard/seo", planRequired: null },
+  {
+    title: "Images",
+    icon: Images,
+    href: "/dashboard/image",
+    planRequired: null,
+  },
+  {
+    title: "Settings",
+    icon: Settings,
+    href: "/dashboard/settings",
+    planRequired: null,
+  },
+];
 
-  { title: "SEO", icon: Activity, href: "/dashboard/seo" },
-  { title: "Images", icon: Images, href: "/dashboard/image" },
-  { title: "Videos", icon: VideoIcon, href: "/dashboard/video" },
-  { title: "Settings", icon: Settings, href: "/dashboard/settings" },
+const premiumMenuItems = [
+  {
+    title: "Chats",
+    icon: MessagesSquare,
+    href: "/dashboard/chat",
+    planRequired: "pro",
+  },
+  {
+    title: "Videos",
+    icon: VideoIcon,
+    href: "/dashboard/video",
+    planRequired: "pro",
+  },
 ];
 
 export const AdminSidebar = memo(() => {
@@ -63,6 +93,7 @@ export const AdminSidebar = memo(() => {
   const { openUserProfile } = useClerk();
   const { user } = useUser();
   const { credits, subscriptionPlan, isLoading } = useCredits();
+  const { isPremium, planName } = usePlan();
 
   useEffect(() => {
     setIsMounted(true);
@@ -91,6 +122,7 @@ export const AdminSidebar = memo(() => {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              {/* Basic menu items - available to all plans */}
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -104,6 +136,45 @@ export const AdminSidebar = memo(() => {
                   </SidebarMenuItem>
                 );
               })}
+
+              {/* Premium menu items - Pro/Enterprise only */}
+              {premiumMenuItems.map((item) => {
+                const Icon = item.icon;
+
+                if (isPremium) {
+                  // User has access - show normal menu item
+                  return (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton isActive={isActive(item.href)} asChild>
+                        <Link href={item.href}>
+                          <Icon />
+                          <span>{item.title}</span>
+                          <Badge
+                            variant="secondary"
+                            className="ml-auto text-xs"
+                          >
+                            <Crown className="h-3 w-3 mr-1" />
+                            Pro
+                          </Badge>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                } else {
+                  // User doesn't have access - show locked item
+                  return (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton asChild>
+                        <Link href="/pricing" className="opacity-60">
+                          <Icon />
+                          <span>{item.title}</span>
+                          <Lock className="h-3 w-3 ml-auto text-muted-foreground" />
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -116,7 +187,7 @@ export const AdminSidebar = memo(() => {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <Link href="/dashboard">
+                    <Link href="/dashboard/home">
                       <div className="flex items-center gap-2 w-full">
                         <Zap className="h-4 w-4 text-yellow-500" />
                         <div className="flex flex-col flex-1">

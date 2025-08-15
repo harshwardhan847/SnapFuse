@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useUser, UserButton } from '@clerk/nextjs';
-import { Button } from '@/components/ui/button';
-import { CreditsDisplay } from '@/components/credits/credits-display';
-import { Zap } from 'lucide-react';
+import Link from "next/link";
+import { useUser, UserButton } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import { CreditsDisplay } from "@/components/credits/credits-display";
+import { Zap } from "lucide-react";
 
 export function Navbar() {
   const { user, isLoaded } = useUser();
@@ -14,14 +14,17 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+            <Link
+              href="/"
+              className="flex items-center gap-2 font-bold text-xl"
+            >
               <Zap className="h-6 w-6 text-primary" />
               SnapFuse
             </Link>
-            
+
             {user && (
               <div className="hidden md:flex items-center gap-4">
-                <Link href="/dashboard">
+                <Link href="/dashboard/home">
                   <Button variant="ghost">Dashboard</Button>
                 </Link>
                 <Link href="/pricing">
@@ -37,7 +40,7 @@ export function Navbar() {
                 <CreditsDisplay showTopupButton={false} className="w-48" />
               </div>
             )}
-            
+
             {isLoaded ? (
               user ? (
                 <UserButton afterSignOutUrl="/" />

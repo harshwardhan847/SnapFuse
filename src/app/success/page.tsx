@@ -126,7 +126,7 @@ export default function SuccessPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/dashboard">
+            <Link href="/dashboard/home">
               <Button size="lg" className="w-full sm:w-auto">
                 Go to Dashboard
               </Button>
