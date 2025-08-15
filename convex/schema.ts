@@ -17,7 +17,8 @@ export default defineSchema({
     stripeSubscriptionId: v.optional(v.string()),
     subscriptionStatus: v.optional(v.string()), // active, canceled, past_due, etc.
     subscriptionPeriodEnd: v.optional(v.number()), // Unix timestamp
-  }).index("byExternalId", ["externalId"])
+  })
+    .index("byExternalId", ["externalId"])
     .index("byStripeCustomerId", ["stripeCustomerId"])
     .index("byStripeSubscriptionId", ["stripeSubscriptionId"]),
 
@@ -30,13 +31,14 @@ export default defineSchema({
     relatedId: v.optional(v.string()), // ID of related image/video/subscription
     balanceAfter: v.number(), // Credits balance after this transaction
     createdAt: v.number(), // Unix timestamp
-  }).index("byUserId", ["userId"])
+  })
+    .index("byUserId", ["userId"])
     .index("byUserIdAndCreatedAt", ["userId", "createdAt"]),
 
   // Stripe payment records
   payments: defineTable({
     userId: v.string(),
-    stripePaymentIntentId: v.string(),
+    stripePaymentIntentId: v.union(v.string(), v.null()),
     stripeSessionId: v.optional(v.string()),
     amount: v.number(), // Amount in cents
     currency: v.string(),
@@ -46,7 +48,8 @@ export default defineSchema({
     creditsAdded: v.optional(v.number()), // For topups
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index("byUserId", ["userId"])
+  })
+    .index("byUserId", ["userId"])
     .index("byStripePaymentIntentId", ["stripePaymentIntentId"])
     .index("byStripeSessionId", ["stripeSessionId"]),
 

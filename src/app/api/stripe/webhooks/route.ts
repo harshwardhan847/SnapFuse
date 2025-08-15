@@ -95,6 +95,7 @@ export async function POST(req: NextRequest) {
 async function handleCheckoutSessionCompleted(
   session: Stripe.Checkout.Session
 ) {
+  console.log(session);
   const { userId, type, planId, topupId } = session.metadata || {};
 
   if (!userId) {
@@ -105,7 +106,7 @@ async function handleCheckoutSessionCompleted(
   // Record the payment
   await convex.mutation(api.payments.recordPayment, {
     userId,
-    stripePaymentIntentId: session.payment_intent as string,
+    stripePaymentIntentId: session.payment_intent,
     stripeSessionId: session.id,
     amount: session.amount_total || 0,
     currency: session.currency || "usd",

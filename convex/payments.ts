@@ -43,7 +43,7 @@ export const deductCredits = mutation({
     }
 
     const currentCredits = user.credits || 0;
-    
+
     if (currentCredits < args.amount) {
       throw new Error("Insufficient credits");
     }
@@ -161,8 +161,8 @@ export const cancelSubscription = mutation({
 
     // Update to free plan
     await ctx.db.patch(user._id, {
-      subscriptionPlan: 'free',
-      subscriptionStatus: 'canceled',
+      subscriptionPlan: "free",
+      subscriptionStatus: "canceled",
     });
 
     // Record the cancellation
@@ -181,7 +181,7 @@ export const cancelSubscription = mutation({
 
 // Get user's credit transaction history
 export const getCreditHistory = query({
-  args: { 
+  args: {
     userId: v.string(),
     limit: v.optional(v.number()),
   },
@@ -200,7 +200,7 @@ export const getCreditHistory = query({
 export const recordPayment = mutation({
   args: {
     userId: v.string(),
-    stripePaymentIntentId: v.string(),
+    stripePaymentIntentId: v.union(v.string(), v.null()),
     stripeSessionId: v.optional(v.string()),
     amount: v.number(),
     currency: v.string(),
@@ -211,7 +211,7 @@ export const recordPayment = mutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
-    
+
     await ctx.db.insert("payments", {
       userId: args.userId,
       stripePaymentIntentId: args.stripePaymentIntentId,
@@ -260,7 +260,9 @@ export const getUserByStripeCustomerId = query({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("users")
-      .withIndex("byStripeCustomerId", (q) => q.eq("stripeCustomerId", args.stripeCustomerId))
+      .withIndex("byStripeCustomerId", (q) =>
+        q.eq("stripeCustomerId", args.stripeCustomerId)
+      )
       .first();
   },
 });
@@ -271,7 +273,9 @@ export const getUserByStripeSubscriptionId = query({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("users")
-      .withIndex("byStripeSubscriptionId", (q) => q.eq("stripeSubscriptionId", args.stripeSubscriptionId))
+      .withIndex("byStripeSubscriptionId", (q) =>
+        q.eq("stripeSubscriptionId", args.stripeSubscriptionId)
+      )
       .first();
   },
 });
@@ -294,7 +298,7 @@ export const deductCreditsInternal = mutation({
     }
 
     const currentCredits = user.credits || 0;
-    
+
     if (currentCredits < args.amount) {
       throw new Error("Insufficient credits");
     }
