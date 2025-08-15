@@ -13,7 +13,7 @@ import {
   UITools,
 } from "ai";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MessagesList from "./../_components/messages";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../../convex/_generated/api";
@@ -27,13 +27,16 @@ interface Attachment {
 type Props = {
   chatId: string;
   initialMessages: UIMessage<unknown, UIDataTypes, UITools>[];
+  onLoadMore?: () => void;
+  canLoadMore?: boolean;
+  isLoadingMore?: boolean;
 };
 
-const Chat = ({ chatId, initialMessages }: Props) => {
+const Chat = ({ chatId, initialMessages, onLoadMore, canLoadMore, isLoadingMore }: Props) => {
   const { userId } = useAuth();
   const addMessage = useMutation(api.messages.addMessage);
 
-  const { messages, sendMessage, status, stop, addToolResult } = useChat({
+  const { messages, sendMessage, status, stop, addToolResult, setMessages } = useChat({
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     transport: new DefaultChatTransport({
       api: "/api/chat",
@@ -79,7 +82,15 @@ const Chat = ({ chatId, initialMessages }: Props) => {
     return "image/*";
   }
 
-  console.log(messages);
+  // Update messages when initialMessages changes (when more messages are loaded)
+  useEffect(() => {
+    if (initialMessages && initialMessages.length > 0) {
+      console.log("Updating messages from initialMessages:", initialMessages.length);
+      setMessages(initialMessages);
+    }
+  }, [initialMessages, setMessages]);
+
+  console.log("Chat messages:", messages.length);
 
   return (
     <div
@@ -88,7 +99,14 @@ const Chat = ({ chatId, initialMessages }: Props) => {
         hasMessages ? "justify-between" : "justify-center"
       )}
     >
-      {hasMessages && <MessagesList messages={messages} />}
+      {hasMessages && (
+        <MessagesList
+          messages={messages}
+          onLoadMore={onLoadMore}
+          canLoadMore={canLoadMore}
+          isLoadingMore={isLoadingMore}
+        />
+      )}
 
       {(status === "submitted" || status === "streaming") && (
         <div>

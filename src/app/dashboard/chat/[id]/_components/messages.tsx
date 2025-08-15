@@ -171,9 +171,8 @@ const ProductImageGenerationPart = ({ part }: { part: any }) => {
                     alt="Input image"
                     width={128}
                     height={128}
-                    className={`object-cover w-full h-full ${
-                      derivedProcessing ? "blur-sm" : ""
-                    }`}
+                    className={`object-cover w-full h-full ${derivedProcessing ? "blur-sm" : ""
+                      }`}
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">
@@ -446,9 +445,8 @@ const PromptFromImageToolPart = ({ part }: { part: any }) => {
                     alt="Input image"
                     width={128}
                     height={128}
-                    className={`object-cover w-full h-full ${
-                      isProcessing ? "blur-sm" : ""
-                    }`}
+                    className={`object-cover w-full h-full ${isProcessing ? "blur-sm" : ""
+                      }`}
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">
@@ -635,9 +633,8 @@ const PromptFromImageForVideoToolPart = ({ part }: { part: any }) => {
                     alt="Input image"
                     width={128}
                     height={128}
-                    className={`object-cover w-full h-full ${
-                      isProcessing ? "blur-sm" : ""
-                    }`}
+                    className={`object-cover w-full h-full ${isProcessing ? "blur-sm" : ""
+                      }`}
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">
@@ -831,16 +828,14 @@ const MessageBubble = ({ message }: { message: UIMessage }) => {
 
   return (
     <div
-      className={`flex items-start mb-4 ${
-        isUser ? "justify-end" : "justify-start"
-      }`}
+      className={`flex items-start mb-4 ${isUser ? "justify-end" : "justify-start"
+        }`}
     >
       <Card
-        className={`max-w-3xl w-full ${
-          isUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-card text-card-foreground"
-        }`}
+        className={`max-w-3xl w-full ${isUser
+          ? "bg-primary text-primary-foreground"
+          : "bg-card text-card-foreground"
+          }`}
       >
         <CardContent className="p-4">
           <div className="flex flex-col gap-3">
@@ -854,12 +849,60 @@ const MessageBubble = ({ message }: { message: UIMessage }) => {
   );
 };
 
-const MessagesList = ({ messages }: { messages: UIMessage[] }) => {
+const MessagesList = ({
+  messages,
+  onLoadMore,
+  canLoadMore,
+  isLoadingMore,
+}: {
+  messages: UIMessage[];
+  onLoadMore?: () => void;
+  canLoadMore?: boolean;
+  isLoadingMore?: boolean;
+}) => {
   const messageEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
+  const [hasTriggeredLoad, setHasTriggeredLoad] = useState(false);
 
+  // Scroll to bottom when new messages arrive (but not when loading older messages)
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (shouldScrollToBottom && messages.length > 0) {
+      messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages.length, shouldScrollToBottom]);
+
+  // Handle scroll events to detect when user scrolls to top
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+
+      // Check if user is near the bottom (within 100px)
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShouldScrollToBottom(isNearBottom);
+
+      // Check if user scrolled to the top and can load more
+      if (
+        scrollTop < 100 &&
+        canLoadMore &&
+        !isLoadingMore &&
+        !hasTriggeredLoad &&
+        onLoadMore
+      ) {
+        console.log("Loading more messages...");
+        setHasTriggeredLoad(true);
+        onLoadMore();
+        // Reset the trigger after a delay
+        setTimeout(() => setHasTriggeredLoad(false), 1000);
+      }
+    };
+
+    scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
+    return () => scrollContainer.removeEventListener("scroll", handleScroll);
+  }, [canLoadMore, isLoadingMore, hasTriggeredLoad, onLoadMore]);
 
   // Find the latest assistant message
   const lastAssistantMsgId = [...messages]
@@ -867,7 +910,26 @@ const MessagesList = ({ messages }: { messages: UIMessage[] }) => {
     .find((m) => m.role === "assistant")?.id;
 
   return (
-    <div className="w-full h-full flex-1 flex flex-col pt-4 pb-64 px-8 min-h-auto max-h-screen overflow-auto">
+    <div
+      ref={scrollContainerRef}
+      className="w-full h-full flex-1 flex flex-col pt-4 pb-64 px-8 min-h-auto max-h-screen overflow-auto"
+    >
+      {/* Load More Indicator */}
+      {(canLoadMore || isLoadingMore) && (
+        <div className="flex justify-center py-4">
+          {isLoadingMore ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader className="h-4 w-4 animate-spin" />
+              Loading older messages...
+            </div>
+          ) : canLoadMore ? (
+            <div className="text-sm text-muted-foreground">
+              Scroll up to load older messages
+            </div>
+          ) : null}
+        </div>
+      )}
+
       {messages?.map((message) => (
         <MessageBubble key={message.id} message={message} />
       ))}
