@@ -40,6 +40,7 @@ export default defineSchema({
     userId: v.string(),
     stripePaymentIntentId: v.optional(v.union(v.string(), v.null())),
     stripeSessionId: v.optional(v.string()),
+    stripeInvoiceId: v.optional(v.string()),
     amount: v.number(), // Amount in cents
     currency: v.string(),
     status: v.string(), // succeeded, pending, failed, etc.

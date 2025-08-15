@@ -202,6 +202,7 @@ export const recordPayment = mutation({
     userId: v.string(),
     stripePaymentIntentId: v.optional(v.union(v.string(), v.null())),
     stripeSessionId: v.optional(v.string()),
+    stripeInvoiceId: v.optional(v.string()),
     amount: v.number(),
     currency: v.string(),
     status: v.string(),
@@ -216,6 +217,7 @@ export const recordPayment = mutation({
       userId: args.userId,
       stripePaymentIntentId: args.stripePaymentIntentId,
       stripeSessionId: args.stripeSessionId,
+      stripeInvoiceId: args.stripeInvoiceId,
       amount: args.amount,
       currency: args.currency,
       status: args.status,
@@ -276,6 +278,30 @@ export const getUserByStripeSubscriptionId = query({
       .withIndex("byStripeSubscriptionId", (q) =>
         q.eq("stripeSubscriptionId", args.stripeSubscriptionId)
       )
+      .first();
+  },
+});
+
+// Check if payment already exists by session ID (for idempotency)
+export const getPaymentBySessionId = query({
+  args: { sessionId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("payments")
+      .withIndex("byStripeSessionId", (q) =>
+        q.eq("stripeSessionId", args.sessionId)
+      )
+      .first();
+  },
+});
+
+// Check if payment already exists by invoice ID (for idempotency)
+export const getPaymentByInvoiceId = query({
+  args: { invoiceId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("payments")
+      .filter((q) => q.eq(q.field("stripeInvoiceId"), args.invoiceId))
       .first();
   },
 });

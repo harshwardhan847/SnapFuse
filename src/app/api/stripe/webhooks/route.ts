@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
 async function handleCheckoutSessionCompleted(
   session: Stripe.Checkout.Session
 ) {
-  console.log(session);
+  console.log("Processing checkout session:", session.id);
   const { userId, type, planId, topupId } = session.metadata || {};
 
   if (!userId) {
@@ -103,10 +103,24 @@ async function handleCheckoutSessionCompleted(
     return;
   }
 
+  // Check if we've already processed this session to prevent duplicates
+  try {
+    const existingPayment = await convex.query(api.payments.getPaymentBySessionId, {
+      sessionId: session.id,
+    });
+
+    if (existingPayment) {
+      console.log(`Payment already processed for session: ${session.id}`);
+      return;
+    }
+  } catch (error) {
+    console.log("No existing payment found, proceeding with processing");
+  }
+
   // Record the payment
   await convex.mutation(api.payments.recordPayment, {
     userId,
-    stripePaymentIntentId: session.payment_intent,
+    stripePaymentIntentId: typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id || null,
     stripeSessionId: session.id,
     amount: session.amount_total || 0,
     currency: session.currency || "usd",
@@ -218,12 +232,28 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   const subscriptionId = invoice.parent?.subscription_details
     ?.subscription as string;
 
-  if (!subscriptionId) {
+  if (!subscriptionId || !customerId) {
     // This is not a subscription invoice, skip
     return;
   }
 
+  // Skip initial subscription invoices (they're handled by checkout.session.completed)
+  if (invoice.billing_reason === 'subscription_create') {
+    console.log("Skipping initial subscription invoice, handled by checkout session");
+    return;
+  }
+
   try {
+    // Check if we've already processed this invoice to prevent duplicates
+    const existingPayment = await convex.query(api.payments.getPaymentByInvoiceId, {
+      invoiceId: invoice.id,
+    });
+
+    if (existingPayment) {
+      console.log(`Invoice already processed: ${invoice.id}`);
+      return;
+    }
+
     // Find user by Stripe customer ID
     const user = await convex.query(api.payments.getUserByStripeCustomerId, {
       stripeCustomerId: customerId,
@@ -271,8 +301,8 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       // Record the payment
       await convex.mutation(api.payments.recordPayment, {
         userId: user.externalId,
-        stripePaymentIntentId: invoice.payments?.data[0].payment
-          .payment_intent as string,
+        stripePaymentIntentId: invoice.payments?.data[0].payment,
+        stripeInvoiceId: invoice.id,
         amount: invoice.amount_paid,
         currency: invoice.currency,
         status: invoice.status || "paid",
