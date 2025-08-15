@@ -11,31 +11,85 @@ export async function POST(request: NextRequest) {
   try {
     const { inputStorageId, prompt, userId } = await request.json();
 
-    // Get the image URL from the storage ID
-    const imageUrl = await convex.query(api.images.getStorageUrl, {
-      storageId: inputStorageId as any,
-    });
-
-    if (!imageUrl) {
-      return NextResponse.json({ error: "Image not found" }, { status: 404 });
+    if (!userId) {
+      return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
-    const { request_id } = await fal.queue.submit("fal-ai/flux-kontext/dev", {
-      input: { prompt, image_url: imageUrl },
-      webhookUrl: `${process.env.APP_BASE_URL}/api/webhooks/falai`,
+    // Check if user has sufficient credits before proceeding
+    const userCredits = await convex.query(api.payments.checkCredits, {
+      userId,
+      requiredCredits: 1, // 1 credit for image generation
     });
 
+    if (!userCredits.hasCredits) {
+      return NextResponse.json(
+        {
+          error: "Insufficient credits",
+          currentCredits: userCredits.currentCredits,
+          requiredCredits: 1
+        },
+        { status: 402 } // Payment Required
+      );
+    }
+
+    // Get the image URL from the storage ID if provided
+    let imageUrl = null;
+    if (inputStorageId) {
+      imageUrl = await convex.query(api.images.getStorageUrl, {
+        storageId: inputStorageId as any,
+      });
+
+      if (!imageUrl) {
+        return NextResponse.json({ error: "Image not found" }, { status: 404 });
+      }
+    }
+
+    const requestId = `img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+    // Create image job record (this will deduct credits automatically)
     await convex.mutation(api.images.createImageJobRecord, {
       image_url: null,
       prompt,
-      request_id,
+      request_id: requestId,
       input_storage_id: inputStorageId || null,
       userId,
     });
 
-    return NextResponse.json({ status: "processing", requestId: request_id });
-  } catch (error) {
-    console.error("Fal.ai submission error:", error);
+    // Submit to FAL AI for processing
+    const { request_id } = await fal.queue.submit("fal-ai/flux-kontext/dev", {
+      input: {
+        prompt,
+        image_url: imageUrl
+      },
+      webhookUrl: `${process.env.APP_BASE_URL}/api/webhooks/falai`,
+    });
+
+    // Update the request ID if different from what we generated
+    if (request_id !== requestId) {
+      await convex.mutation(api.images.updateImageJobStatus, {
+        request_id: requestId,
+        status: "processing",
+        image_url: null,
+        error_message: null,
+      });
+    }
+
+    return NextResponse.json({
+      status: "processing",
+      requestId: request_id,
+      creditsDeducted: 1,
+      remainingCredits: userCredits.currentCredits - 1
+    });
+  } catch (error: any) {
+    console.error("Image generation error:", error);
+
+    if (error.message?.includes("Insufficient credits")) {
+      return NextResponse.json(
+        { error: "Insufficient credits" },
+        { status: 402 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to submit job" },
       { status: 500 }

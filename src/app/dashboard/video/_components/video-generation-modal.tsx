@@ -5,7 +5,9 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader, Wand2, Sparkles, Video } from "lucide-react";
+import { Loader, Wand2, Sparkles, Video, Zap } from "lucide-react";
+import { useCredits } from "@/hooks/use-credits";
+import { InsufficientCreditsModal } from "@/components/credits/insufficient-credits-modal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -50,6 +52,10 @@ const VideoGenerationModal = ({ userId }: Props) => {
     "blur, distort, and low quality"
   );
   const [cfgScale, setCfgScale] = useState<number>(0.5);
+  const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
+
+  const { canAfford, getCreditCostForAction } = useCredits();
+  const requiredCredits = getCreditCostForAction("VIDEO_GENERATION");
 
   const formSchema = z.object({
     imageUrl: z.string().url({ message: "Please enter a valid image URL" }),
@@ -65,27 +71,52 @@ const VideoGenerationModal = ({ userId }: Props) => {
   });
 
   async function generateVideo(imageUrl: string, prompt: string) {
-    setIsProcessing(true);
-    const response = await fetch("/api/generate-video", {
-      method: "POST",
-      body: JSON.stringify({
-        prompt,
-        userId,
-        inputStorageId,
-        duration,
-        negative_prompt: negativePrompt,
-        cfg_scale: cfgScale,
-      }),
-      headers: { "Content-Type": "application/json" },
-    });
-    const data = await response.json();
-    if (data.status === "processing") {
-      toast.success("Video generation added to queue");
-    } else {
-      toast.error("Error occurred during video generation.");
-      console.error("Error occurred during video generation.");
+    // Check credits before processing
+    if (!canAfford("VIDEO_GENERATION")) {
+      setShowInsufficientCredits(true);
+      return;
     }
-    setIsProcessing(false);
+
+    setIsProcessing(true);
+    try {
+      const response = await fetch("/api/generate-video", {
+        method: "POST",
+        body: JSON.stringify({
+          prompt,
+          userId,
+          inputStorageId,
+          duration,
+          negative_prompt: negativePrompt,
+          cfg_scale: cfgScale,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 402) {
+          setShowInsufficientCredits(true);
+          return;
+        }
+        throw new Error(data.error || "Failed to generate video");
+      }
+
+      if (data.status === "processing") {
+        toast.success(`Video generation started! ${data.creditsDeducted} credits deducted. ${data.remainingCredits} credits remaining.`);
+      } else {
+        toast.error("Error occurred during video generation.");
+        console.error("Error occurred during video generation.");
+      }
+    } catch (error: any) {
+      console.error("Video generation error:", error);
+      if (error.message?.includes("Insufficient credits")) {
+        setShowInsufficientCredits(true);
+      } else {
+        toast.error(error.message || "Failed to generate video");
+      }
+    } finally {
+      setIsProcessing(false);
+    }
   }
 
   async function handleGenerateOrImprovePrompt() {
@@ -200,7 +231,13 @@ const VideoGenerationModal = ({ userId }: Props) => {
             })}
           >
             <DialogHeader>
-              <DialogTitle>Generate Video from Image</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                Generate Video from Image
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Zap className="h-4 w-4 text-yellow-500" />
+                  {requiredCredits} credits
+                </div>
+              </DialogTitle>
             </DialogHeader>
 
             <div className="grid gap-4 my-4">
@@ -454,7 +491,8 @@ const VideoGenerationModal = ({ userId }: Props) => {
                   isProcessing ||
                   form.formState.isSubmitting ||
                   isUploading ||
-                  !form.getValues("imageUrl")
+                  !form.getValues("imageUrl") ||
+                  !canAfford("VIDEO_GENERATION")
                 }
               >
                 {isProcessing || form.formState.isSubmitting ? (
@@ -462,6 +500,8 @@ const VideoGenerationModal = ({ userId }: Props) => {
                     <Loader size={14} className="animate-spin mr-2" />
                     Generating Video
                   </>
+                ) : !canAfford("VIDEO_GENERATION") ? (
+                  "Insufficient Credits"
                 ) : (
                   <>
                     <Video size={14} className="mr-2" />
@@ -473,6 +513,13 @@ const VideoGenerationModal = ({ userId }: Props) => {
           </form>
         </DialogContent>
       </Form>
+
+      <InsufficientCreditsModal
+        open={showInsufficientCredits}
+        onOpenChange={setShowInsufficientCredits}
+        requiredCredits={requiredCredits}
+        action="video generation"
+      />
     </Dialog>
   );
 };

@@ -9,8 +9,6 @@ import { InsufficientCreditsModal } from '@/components/credits/insufficient-cred
 import { CreditsDisplay } from '@/components/credits/credits-display';
 import { Loader2, Video, Zap } from 'lucide-react';
 import { toast } from 'sonner';
-import { useMutation } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
 import { useUser } from '@clerk/nextjs';
 
 export function VideoGenerator() {
@@ -20,7 +18,6 @@ export function VideoGenerator() {
 
     const { user } = useUser();
     const { canAfford, getCreditCostForAction } = useCredits();
-    const createVideoJob = useMutation(api.videos.createVideoJobRecord);
 
     const requiredCredits = getCreditCostForAction('VIDEO_GENERATION');
 
@@ -43,31 +40,42 @@ export function VideoGenerator() {
 
         setLoading(true);
         try {
-            const requestId = `vid_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-            // Create video job record (this will deduct credits automatically)
-            await createVideoJob({
-                request_id: requestId,
-                prompt: prompt.trim(),
-                input_storage_id: null,
-                userId: user.id,
-                duration: '5', // Default 5 seconds
-                negative_prompt: '',
-                cfg_scale: 7,
+            // Call the API endpoint to generate video
+            const response = await fetch('/api/generate-video', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    prompt: prompt.trim(),
+                    userId: user.id,
+                    inputStorageId: null, // For text-to-video generation
+                    duration: '5',
+                    negative_prompt: 'blur, distort, and low quality',
+                    cfg_scale: 0.5,
+                }),
             });
 
-            toast.success('Video generation started! Credits deducted.');
-            setPrompt('');
+            const data = await response.json();
 
-            // Here you would typically trigger the actual video generation
-            // For example, calling your FAL AI endpoint or other video generation service
+            if (!response.ok) {
+                if (response.status === 402) {
+                    // Insufficient credits
+                    setShowInsufficientCredits(true);
+                    return;
+                }
+                throw new Error(data.error || 'Failed to generate video');
+            }
+
+            toast.success(`Video generation started! ${data.creditsDeducted} credits deducted. ${data.remainingCredits} credits remaining.`);
+            setPrompt('');
 
         } catch (error: any) {
             console.error('Video generation error:', error);
             if (error.message.includes('Insufficient credits')) {
                 setShowInsufficientCredits(true);
             } else {
-                toast.error('Failed to start video generation');
+                toast.error(error.message || 'Failed to start video generation');
             }
         } finally {
             setLoading(false);

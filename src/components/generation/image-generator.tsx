@@ -7,10 +7,7 @@ import { InsufficientCreditsModal } from "@/components/credits/insufficient-cred
 import { CreditsDisplay } from "@/components/credits/credits-display";
 import { Loader2, Image, Zap } from "lucide-react";
 import { toast } from "sonner";
-import { useMutation } from "convex/react";
-
 import { useUser } from "@clerk/nextjs";
-import { api } from "../../../convex/_generated/api";
 
 export function ImageGenerator() {
   const [prompt, setPrompt] = useState("");
@@ -19,7 +16,6 @@ export function ImageGenerator() {
 
   const { user } = useUser();
   const { canAfford, getCreditCostForAction } = useCredits();
-  const createImageJob = useMutation(api.images.createImageJobRecord);
 
   const requiredCredits = getCreditCostForAction("IMAGE_GENERATION");
 
@@ -42,28 +38,39 @@ export function ImageGenerator() {
 
     setLoading(true);
     try {
-      const requestId = `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-      // Create image job record (this will deduct credits automatically)
-      await createImageJob({
-        request_id: requestId,
-        prompt: prompt.trim(),
-        image_url: null,
-        input_storage_id: null,
-        userId: user.id,
+      // Call the API endpoint to generate image
+      const response = await fetch("/api/generate-image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+          userId: user.id,
+          inputStorageId: null, // For text-to-image generation
+        }),
       });
 
-      toast.success("Image generation started! Credits deducted.");
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 402) {
+          // Insufficient credits
+          setShowInsufficientCredits(true);
+          return;
+        }
+        throw new Error(data.error || "Failed to generate image");
+      }
+
+      toast.success(`Image generation started! ${data.creditsDeducted} credit deducted. ${data.remainingCredits} credits remaining.`);
       setPrompt("");
 
-      // Here you would typically trigger the actual image generation
-      // For example, calling your FAL AI endpoint or other image generation service
     } catch (error: any) {
       console.error("Image generation error:", error);
       if (error.message.includes("Insufficient credits")) {
         setShowInsufficientCredits(true);
       } else {
-        toast.error("Failed to start image generation");
+        toast.error(error.message || "Failed to start image generation");
       }
     } finally {
       setLoading(false);

@@ -5,7 +5,9 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader, Wand2, Sparkles } from "lucide-react";
+import { Loader, Wand2, Sparkles, Zap } from "lucide-react";
+import { useCredits } from "@/hooks/use-credits";
+import { InsufficientCreditsModal } from "@/components/credits/insufficient-credits-modal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -50,6 +52,10 @@ const ImageGenerationModal = ({ userId }: Props) => {
   >("");
   const [advBackground, setAdvBackground] = useState<string>("");
   const [advUpscale, setAdvUpscale] = useState<boolean>(false);
+  const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
+
+  const { canAfford, getCreditCostForAction } = useCredits();
+  const requiredCredits = getCreditCostForAction("IMAGE_GENERATION");
 
   const formSchema = z.object({
     imageUrl: z.string().url({ message: "Please enter a valid image URL" }),
@@ -65,20 +71,45 @@ const ImageGenerationModal = ({ userId }: Props) => {
   });
 
   async function generateImage(imageUrl: string, prompt: string) {
-    setIsProcessing(true);
-    const response = await fetch("/api/generate-image", {
-      method: "POST",
-      body: JSON.stringify({ imageUrl, prompt, userId, inputStorageId }),
-      headers: { "Content-Type": "application/json" },
-    });
-    const data = await response.json();
-    if (data.status === "processing") {
-      toast.success("Added to queue");
-    } else {
-      toast.error("Error occurred during generation.");
-      console.error("Error occurred during generation.");
+    // Check credits before processing
+    if (!canAfford("IMAGE_GENERATION")) {
+      setShowInsufficientCredits(true);
+      return;
     }
-    setIsProcessing(false);
+
+    setIsProcessing(true);
+    try {
+      const response = await fetch("/api/generate-image", {
+        method: "POST",
+        body: JSON.stringify({ imageUrl, prompt, userId, inputStorageId }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 402) {
+          setShowInsufficientCredits(true);
+          return;
+        }
+        throw new Error(data.error || "Failed to generate image");
+      }
+
+      if (data.status === "processing") {
+        toast.success(`Image generation started! ${data.creditsDeducted} credit deducted. ${data.remainingCredits} credits remaining.`);
+      } else {
+        toast.error("Error occurred during generation.");
+        console.error("Error occurred during generation.");
+      }
+    } catch (error: any) {
+      console.error("Image generation error:", error);
+      if (error.message?.includes("Insufficient credits")) {
+        setShowInsufficientCredits(true);
+      } else {
+        toast.error(error.message || "Failed to generate image");
+      }
+    } finally {
+      setIsProcessing(false);
+    }
   }
 
   async function handleGenerateOrImprovePrompt() {
@@ -188,7 +219,13 @@ const ImageGenerationModal = ({ userId }: Props) => {
             })}
           >
             <DialogHeader>
-              <DialogTitle>Generate Image</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                Generate Image
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Zap className="h-4 w-4 text-yellow-500" />
+                  {requiredCredits} credit
+                </div>
+              </DialogTitle>
             </DialogHeader>
 
             <div className="grid gap-4 my-4">
@@ -413,7 +450,8 @@ const ImageGenerationModal = ({ userId }: Props) => {
                   isProcessing ||
                   form.formState.isSubmitting ||
                   isUploading ||
-                  !form.getValues("imageUrl")
+                  !form.getValues("imageUrl") ||
+                  !canAfford("IMAGE_GENERATION")
                 }
               >
                 {isProcessing || form.formState.isSubmitting ? (
@@ -421,6 +459,8 @@ const ImageGenerationModal = ({ userId }: Props) => {
                     <Loader size={14} className="animate-spin mr-2" />
                     Generating
                   </>
+                ) : !canAfford("IMAGE_GENERATION") ? (
+                  "Insufficient Credits"
                 ) : (
                   "Generate"
                 )}
@@ -429,6 +469,13 @@ const ImageGenerationModal = ({ userId }: Props) => {
           </form>
         </DialogContent>
       </Form>
+
+      <InsufficientCreditsModal
+        open={showInsufficientCredits}
+        onOpenChange={setShowInsufficientCredits}
+        requiredCredits={requiredCredits}
+        action="image generation"
+      />
     </Dialog>
   );
 };

@@ -26,6 +26,8 @@ import {
   VideoIcon,
   Images,
   MessagesSquare,
+  Zap,
+  CreditCard,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import {
@@ -37,6 +39,8 @@ import {
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCredits } from "@/hooks/use-credits";
+import { Badge } from "@/components/ui/badge";
 
 const menuItems = [
   { title: "Home", icon: LayoutDashboard, href: "/dashboard/home" },
@@ -58,6 +62,7 @@ export const AdminSidebar = memo(() => {
   const { isSignedIn, isLoaded } = useAuth();
   const { openUserProfile } = useClerk();
   const { user } = useUser();
+  const { credits, subscriptionPlan, isLoading } = useCredits();
 
   useEffect(() => {
     setIsMounted(true);
@@ -102,6 +107,57 @@ export const AdminSidebar = memo(() => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Credits Display */}
+        {isSignedIn && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Credits</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <Link href="/pricing">
+                      <div className="flex items-center gap-2 w-full">
+                        <Zap className="h-4 w-4 text-yellow-500" />
+                        <div className="flex flex-col flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">
+                              {isLoading ? (
+                                <Skeleton className="h-4 w-12" />
+                              ) : (
+                                `${credits} Credits`
+                              )}
+                            </span>
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {isLoading ? (
+                              <Skeleton className="h-3 w-16" />
+                            ) : (
+                              <Badge variant="outline" className="text-xs px-1 py-0">
+                                {subscriptionPlan === 'free' ? 'Free' :
+                                  subscriptionPlan === 'starter' ? 'Starter' :
+                                    subscriptionPlan === 'pro' ? 'Pro' :
+                                      subscriptionPlan === 'enterprise' ? 'Enterprise' : 'Free'}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <Link href="/pricing">
+                      <CreditCard className="h-4 w-4" />
+                      <span>Buy Credits</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter>
