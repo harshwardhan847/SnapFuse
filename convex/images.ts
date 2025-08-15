@@ -124,3 +124,67 @@ export const getAllImagesByUserId = query({
       .collect();
   },
 });
+
+// Paginated query for images
+export const getImagesByUserIdPaginated = query({
+  args: {
+    userId: v.string(),
+    paginationOpts: v.object({
+      numItems: v.number(),
+      cursor: v.union(v.string(), v.null()),
+    }),
+  },
+  handler: async (ctx, { userId, paginationOpts }) => {
+    const results = await ctx.db
+      .query("images")
+      .withIndex("byUserId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .paginate(paginationOpts);
+
+    return {
+      page: results.page,
+      isDone: results.isDone,
+      continueCursor: results.continueCursor,
+    };
+  },
+});
+
+// Get total count of images for a user
+export const getImagesCountByUserId = query({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, { userId }) => {
+    const images = await ctx.db
+      .query("images")
+      .withIndex("byUserId", (q) => q.eq("userId", userId))
+      .collect();
+
+    return images.length;
+  },
+});
+
+// Simple offset-based pagination as backup
+export const getImagesByUserIdOffset = query({
+  args: {
+    userId: v.string(),
+    offset: v.number(),
+    limit: v.number(),
+  },
+  handler: async (ctx, { userId, offset, limit }) => {
+    const allImages = await ctx.db
+      .query("images")
+      .withIndex("byUserId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
+
+    const paginatedImages = allImages.slice(offset, offset + limit);
+    const hasMore = offset + limit < allImages.length;
+
+    return {
+      images: paginatedImages,
+      hasMore,
+      total: allImages.length,
+    };
+  },
+});

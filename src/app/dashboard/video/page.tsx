@@ -6,7 +6,13 @@ import { usePlan } from "@/hooks/use-plan";
 import { useSearchParams, useRouter } from "next/navigation";
 import VideoGenerationModal from "./_components/video-generation-modal";
 import VideoList from "./_components/video-list";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Lock, Crown, Zap, VideoIcon } from "lucide-react";
@@ -21,11 +27,11 @@ const VideoPage = () => {
 
   // Check if modal should be opened from URL params
   useEffect(() => {
-    const shouldOpenModal = searchParams.get('openModal') === 'true';
+    const shouldOpenModal = searchParams.get("openModal") === "true";
     if (shouldOpenModal && isPremium) {
       setOpenModal(true);
       // Clean up URL
-      router.replace('/dashboard/video', { scroll: false });
+      router.replace("/dashboard/video", { scroll: false });
     }
   }, [searchParams, isPremium, router]);
 
@@ -77,10 +83,12 @@ const VideoPage = () => {
             <CardContent className="space-y-4">
               <div className="bg-muted/50 p-4 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-2">
-                  You're currently on the <Badge variant="outline">{planName}</Badge> plan
+                  You're currently on the{" "}
+                  <Badge variant="outline">{planName}</Badge> plan
                 </p>
                 <p className="text-sm">
-                  Upgrade to Pro or Enterprise to unlock video generation and other premium features.
+                  Upgrade to Pro or Enterprise to unlock video generation and
+                  other premium features.
                 </p>
               </div>
 

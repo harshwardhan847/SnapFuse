@@ -29,7 +29,7 @@ type Props = {
 const SeoContent = ({ data, isLoading }: Props) => {
   if (!data) {
     return (
-      <Card className="h-min w-full">
+      <Card className="h-min w-full max-w-md">
         <CardHeader>
           <CardTitle>{isLoading ? "Rank Higher" : "Checklist"}</CardTitle>
           <CardDescription>
@@ -47,27 +47,42 @@ const SeoContent = ({ data, isLoading }: Props) => {
         ) : (
           <CardContent className="space-y-8">
             <ul className="list-disc">
-              <li>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</li>
-              <li>
-                Odio officiis similique reprehenderit natus at necessitatibus
-                nulla!
+              <li>Provide a clear and descriptive product name.
+
               </li>
               <li>
-                Saepe, beatae repudiandae suscipit provident pariatur animi
-                alias!
+                State the main function or purpose of the product.
+
+
               </li>
               <li>
-                Aliquam reiciendis corporis nesciunt nisi obcaecati sunt eos?
+                Highlight unique features or advantages.
+
+
               </li>
               <li>
-                Dignissimos dolore perspiciatis ex sequi dolores possimus quasi.
+                Mention the target audience or use case.
+
+
               </li>
-              <li>Error, magnam eum unde eligendi et quis inventore!</li>
               <li>
-                Voluptatibus alias consequuntur repellat eaque! Deserunt,
-                aperiam consequatur.
+                List important keywords related to the product.
+
               </li>
-              <li>Quas, nam illo? Quia odio incidunt pariatur officiis.</li>
+              <li>Include benefits that solve user problems.
+
+              </li>
+              <li>
+                Specify any technical details or specifications.
+
+
+              </li>
+              <li>Use natural language and avoid jargon where possible.
+
+              </li>
+              <li>Keep the description concise but detailed.
+
+              </li>
             </ul>
           </CardContent>
         )}

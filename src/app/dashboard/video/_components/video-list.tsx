@@ -3,6 +3,14 @@
 import { useQuery } from "convex/react";
 import React, { useMemo, useState } from "react";
 import { api } from "../../../../../convex/_generated/api";
+import { usePagination } from "@/hooks/use-pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { format } from "date-fns";
 
 import {
@@ -38,17 +46,26 @@ const statusClasses: { [key: string]: string } = {
 };
 
 const VideoList = ({ userId }: Props) => {
-  const videos = useQuery(api.videos.getAllVideosByUserId, {
+  const pagination = usePagination({ itemsPerPage: 12 });
+
+  // Use offset-based pagination
+  const offset = (pagination.currentPage - 1) * pagination.itemsPerPage;
+  const paginatedVideosOffset = useQuery(api.videos.getVideosByUserIdOffset, {
     userId,
+    offset,
+    limit: pagination.itemsPerPage,
   });
+
+  // Get total count for display
+  const totalCount = paginatedVideosOffset?.total;
 
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const selectedVideo = useMemo(() => {
-    if (!videos || selectedIndex === null) return null;
-    return videos[selectedIndex];
-  }, [videos, selectedIndex]);
+    if (!paginatedVideosOffset?.videos || selectedIndex === null) return null;
+    return paginatedVideosOffset.videos[selectedIndex];
+  }, [paginatedVideosOffset?.videos, selectedIndex]);
 
   // Resolve the input image URL (stored in Convex storage) for the selected item
   const inputImageUrl = useQuery(
@@ -75,7 +92,7 @@ const VideoList = ({ userId }: Props) => {
     }
   }
 
-  if (!videos) {
+  if (!paginatedVideosOffset || totalCount === undefined) {
     return (
       <div className="flex justify-center py-20">
         <Loader className="animate-spin" />
@@ -83,7 +100,7 @@ const VideoList = ({ userId }: Props) => {
     );
   }
 
-  if (videos.length === 0) {
+  if (totalCount === 0) {
     return (
       <div className="flex justify-center py-20">
         <Label className="text-gray-500">No videos found.</Label>
@@ -91,8 +108,22 @@ const VideoList = ({ userId }: Props) => {
     );
   }
 
+  const videos = paginatedVideosOffset.videos;
+  const hasNextPage = paginatedVideosOffset.hasMore;
+  const hasPreviousPage = pagination.currentPage > 1;
+
   return (
     <>
+      {/* Pagination Info */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-sm text-muted-foreground">
+          Showing {videos.length} of {totalCount} videos
+          {totalCount > pagination.itemsPerPage && (
+            <span className="ml-2">(Page {pagination.currentPage})</span>
+          )}
+        </div>
+      </div>
+
       <div className="grid gap-6 mt-4 sm:grid-cols-2 lg:grid-cols-3 w-full">
         {videos.map((video: Doc<"videos">, index: number) => {
           const status = (video.status || "").toLowerCase();
@@ -207,6 +238,53 @@ const VideoList = ({ userId }: Props) => {
           );
         })}
       </div>
+
+      {/* Pagination Controls */}
+      {totalCount > pagination.itemsPerPage && (
+        <div className="mt-8">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  size="default"
+                  onClick={() => {
+                    if (hasPreviousPage) {
+                      pagination.goToPage(pagination.currentPage - 1);
+                    }
+                  }}
+                  className={
+                    !hasPreviousPage
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+
+              <PaginationItem>
+                <span className="flex h-9 items-center justify-center px-4 text-sm">
+                  Page {pagination.currentPage}
+                </span>
+              </PaginationItem>
+
+              <PaginationItem>
+                <PaginationNext
+                  size="default"
+                  onClick={() => {
+                    if (hasNextPage) {
+                      pagination.goToPage(pagination.currentPage + 1);
+                    }
+                  }}
+                  className={
+                    !hasNextPage
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
 
       <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
         <DialogContent className="sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-[80vw]">

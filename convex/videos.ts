@@ -120,6 +120,78 @@ export const getAllVideosByUserId = query({
   },
 });
 
+// Paginated query for videos
+export const getVideosByUserIdPaginated = query({
+  args: {
+    userId: v.string(),
+    paginationOpts: v.object({
+      numItems: v.number(),
+      cursor: v.union(v.string(), v.null()),
+    }),
+  },
+  handler: async (ctx, { userId, paginationOpts }) => {
+    const results = await ctx.db
+      .query("videos")
+      .withIndex("byUserId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .paginate(paginationOpts);
+
+    return {
+      page: results.page,
+      isDone: results.isDone,
+      continueCursor: results.continueCursor,
+    };
+  },
+});
+
+// Get total count of videos for a user
+export const getVideosCountByUserId = query({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, { userId }) => {
+    const videos = await ctx.db
+      .query("videos")
+      .withIndex("byUserId", (q) => q.eq("userId", userId))
+      .collect();
+
+    return videos.length;
+  },
+});
+
+// Simple offset-based pagination as backup
+export const getVideosByUserIdOffset = query({
+  args: {
+    userId: v.string(),
+    offset: v.number(),
+    limit: v.number(),
+  },
+  handler: async (ctx, { userId, offset, limit }) => {
+    console.log("Video offset query called with:", { userId, offset, limit });
+
+    const allVideos = await ctx.db
+      .query("videos")
+      .withIndex("byUserId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
+
+    const paginatedVideos = allVideos.slice(offset, offset + limit);
+    const hasMore = offset + limit < allVideos.length;
+
+    console.log("Video offset results:", {
+      totalVideos: allVideos.length,
+      paginatedLength: paginatedVideos.length,
+      hasMore,
+    });
+
+    return {
+      videos: paginatedVideos,
+      hasMore,
+      total: allVideos.length,
+    };
+  },
+});
+
 // Generate a signed upload URL for Convex Storage (kept for symmetry with images)
 export const generateUploadUrl = mutation({
   args: {},

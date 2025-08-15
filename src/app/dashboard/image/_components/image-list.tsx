@@ -3,6 +3,14 @@
 import { useQuery } from "convex/react";
 import React, { useMemo, useState } from "react";
 import { api } from "../../../../../convex/_generated/api";
+import { usePagination } from "@/hooks/use-pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { format } from "date-fns";
 
 import {
@@ -40,19 +48,28 @@ const statusClasses: { [key: string]: string } = {
 };
 
 const ImageList = ({ userId }: Props) => {
-  const images = useQuery(api.images.getAllImagesByUserId, {
-    userId,
-  });
   const { isPremium } = usePlan();
   const router = useRouter();
+  const pagination = usePagination({ itemsPerPage: 12 });
+
+  // Use offset-based pagination
+  const offset = (pagination.currentPage - 1) * pagination.itemsPerPage;
+  const paginatedImagesOffset = useQuery(api.images.getImagesByUserIdOffset, {
+    userId,
+    offset,
+    limit: pagination.itemsPerPage,
+  });
+
+  // Get total count for display
+  const totalCount = paginatedImagesOffset?.total;
 
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const selectedImage = useMemo(() => {
-    if (!images || selectedIndex === null) return null;
-    return images[selectedIndex];
-  }, [images, selectedIndex]);
+    if (!paginatedImagesOffset?.images || selectedIndex === null) return null;
+    return paginatedImagesOffset.images[selectedIndex];
+  }, [paginatedImagesOffset?.images, selectedIndex]);
 
   // Resolve the input image URL (stored in Convex storage) for the selected item
   // Passing undefined to useQuery will skip the subscription until we have a storage id
@@ -83,7 +100,7 @@ const ImageList = ({ userId }: Props) => {
   function handleGenerateVideo(image: Doc<"images">) {
     if (!isPremium) {
       // Redirect to pricing if not premium
-      router.push('/pricing');
+      router.push("/pricing");
       return;
     }
 
@@ -94,13 +111,13 @@ const ImageList = ({ userId }: Props) => {
       prompt: image.prompt,
     };
 
-    sessionStorage.setItem('videoGenerationImage', JSON.stringify(imageData));
+    sessionStorage.setItem("videoGenerationImage", JSON.stringify(imageData));
 
     // Navigate to video page with a flag to open the modal
-    router.push('/dashboard/video?openModal=true');
+    router.push("/dashboard/video?openModal=true");
   }
 
-  if (!images) {
+  if (!paginatedImagesOffset || totalCount === undefined) {
     return (
       <div className="flex justify-center py-20">
         <Loader className="animate-spin" />
@@ -108,7 +125,7 @@ const ImageList = ({ userId }: Props) => {
     );
   }
 
-  if (images.length === 0) {
+  if (totalCount === 0) {
     return (
       <div className="flex justify-center py-20">
         <Label className="text-gray-500">No images found.</Label>
@@ -116,8 +133,22 @@ const ImageList = ({ userId }: Props) => {
     );
   }
 
+  const images = paginatedImagesOffset.images;
+  const hasNextPage = paginatedImagesOffset.hasMore;
+  const hasPreviousPage = pagination.currentPage > 1;
+
   return (
     <>
+      {/* Pagination Info */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-sm text-muted-foreground">
+          Showing {images.length} of {totalCount} images
+          {totalCount > pagination.itemsPerPage && (
+            <span className="ml-2">(Page {pagination.currentPage})</span>
+          )}
+        </div>
+      </div>
+
       <div className="grid gap-6 mt-4 sm:grid-cols-2 lg:grid-cols-3 w-full">
         {images.map((image: Doc<"images">, index: number) => {
           const status = (image.status || "").toLowerCase();
@@ -214,7 +245,7 @@ const ImageList = ({ userId }: Props) => {
                       className="gap-1"
                     >
                       <Video className="h-3 w-3" />
-                      {isPremium ? 'Video' : 'Pro'}
+                      {isPremium ? "Video" : "Pro"}
                     </Button>
                   )}
                 </div>
@@ -223,6 +254,53 @@ const ImageList = ({ userId }: Props) => {
           );
         })}
       </div>
+
+      {/* Pagination Controls */}
+      {totalCount > pagination.itemsPerPage && (
+        <div className="mt-8">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  size="default"
+                  onClick={() => {
+                    if (hasPreviousPage) {
+                      pagination.goToPage(pagination.currentPage - 1);
+                    }
+                  }}
+                  className={
+                    !hasPreviousPage
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+
+              <PaginationItem>
+                <span className="flex h-9 items-center justify-center px-4 text-sm">
+                  Page {pagination.currentPage}
+                </span>
+              </PaginationItem>
+
+              <PaginationItem>
+                <PaginationNext
+                  size="default"
+                  onClick={() => {
+                    if (hasNextPage) {
+                      pagination.goToPage(pagination.currentPage + 1);
+                    }
+                  }}
+                  className={
+                    !hasNextPage
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
 
       <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
         <DialogContent className="sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-[80vw]">
@@ -362,7 +440,7 @@ const ImageList = ({ userId }: Props) => {
                         className="gap-1"
                       >
                         <Video className="h-3 w-3" />
-                        {isPremium ? 'Generate Video' : 'Upgrade for Video'}
+                        {isPremium ? "Generate Video" : "Upgrade for Video"}
                       </Button>
                     )}
                   </div>
