@@ -25,6 +25,7 @@ export const getChatsByUser = query(
     return await db
       .query("chats")
       .withIndex("byUserId", (q) => q.eq("userId", userId))
+      .order("desc")
       .collect();
   }
 );

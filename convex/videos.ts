@@ -167,8 +167,6 @@ export const getVideosByUserIdOffset = query({
     limit: v.number(),
   },
   handler: async (ctx, { userId, offset, limit }) => {
-    console.log("Video offset query called with:", { userId, offset, limit });
-
     const allVideos = await ctx.db
       .query("videos")
       .withIndex("byUserId", (q) => q.eq("userId", userId))
