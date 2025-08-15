@@ -116,7 +116,7 @@ export const AdminSidebar = memo(() => {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <Link href="/pricing">
+                    <Link href="/dashboard">
                       <div className="flex items-center gap-2 w-full">
                         <Zap className="h-4 w-4 text-yellow-500" />
                         <div className="flex flex-col flex-1">
@@ -133,11 +133,19 @@ export const AdminSidebar = memo(() => {
                             {isLoading ? (
                               <Skeleton className="h-3 w-16" />
                             ) : (
-                              <Badge variant="outline" className="text-xs px-1 py-0">
-                                {subscriptionPlan === 'free' ? 'Free' :
-                                  subscriptionPlan === 'starter' ? 'Starter' :
-                                    subscriptionPlan === 'pro' ? 'Pro' :
-                                      subscriptionPlan === 'enterprise' ? 'Enterprise' : 'Free'}
+                              <Badge
+                                variant="outline"
+                                className="text-xs px-1 py-0"
+                              >
+                                {subscriptionPlan === "free"
+                                  ? "Free"
+                                  : subscriptionPlan === "starter"
+                                    ? "Starter"
+                                    : subscriptionPlan === "pro"
+                                      ? "Pro"
+                                      : subscriptionPlan === "enterprise"
+                                        ? "Enterprise"
+                                        : "Free"}
                               </Badge>
                             )}
                           </div>

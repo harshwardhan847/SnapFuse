@@ -1,28 +1,40 @@
-'use client';
+"use client";
 
-import { useUser } from '@clerk/nextjs';
-import { useQuery } from 'convex/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { CreditsDisplay } from '@/components/credits/credits-display';
-import { Zap, CreditCard, History, TrendingUp, TrendingDown } from 'lucide-react';
-import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
-import { SUBSCRIPTION_PLANS } from '@/config/pricing';
-import { api } from '../../../convex/_generated/api';
+import { useUser } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { CreditsDisplay } from "@/components/credits/credits-display";
+import {
+  Zap,
+  CreditCard,
+  History,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
+import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
+import { SUBSCRIPTION_PLANS } from "@/config/pricing";
+import { api } from "../../../convex/_generated/api";
 
 export function CreditsDashboard() {
   const { user } = useUser();
 
   const userCredits = useQuery(
     api.payments.getUserCredits,
-    user ? { userId: user.id } : 'skip'
+    user ? { userId: user.id } : "skip"
   );
 
   const creditHistory = useQuery(
     api.payments.getCreditHistory,
-    user ? { userId: user.id, limit: 10 } : 'skip'
+    user ? { userId: user.id, limit: 10 } : "skip"
   );
 
   if (!user || !userCredits) {
@@ -40,7 +52,10 @@ export function CreditsDashboard() {
     );
   }
 
-  const currentPlan = SUBSCRIPTION_PLANS[userCredits.subscriptionPlan?.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS] || SUBSCRIPTION_PLANS.FREE;
+  const currentPlan =
+    SUBSCRIPTION_PLANS[
+      userCredits.subscriptionPlan?.toUpperCase() as keyof typeof SUBSCRIPTION_PLANS
+    ] || SUBSCRIPTION_PLANS.FREE;
 
   return (
     <div className="space-y-6">
@@ -63,11 +78,17 @@ export function CreditsDashboard() {
                   {currentPlan.credits} credits/month
                 </div>
               </div>
-              <Badge variant={userCredits.subscriptionPlan === 'free' ? 'secondary' : 'default'}>
-                {userCredits.subscriptionStatus || 'Active'}
+              <Badge
+                variant={
+                  userCredits.subscriptionPlan === "free"
+                    ? "secondary"
+                    : "default"
+                }
+              >
+                {userCredits.subscriptionStatus || "Active"}
               </Badge>
             </div>
-            {userCredits.subscriptionPlan === 'free' && (
+            {userCredits.subscriptionPlan === "free" && (
               <div className="mt-3">
                 <Link href="/pricing">
                   <Button size="sm" className="w-full">
@@ -88,14 +109,15 @@ export function CreditsDashboard() {
           </CardHeader>
           <CardContent className="pt-0">
             <div className="text-2xl font-bold">
-              {creditHistory?.filter((t: any) =>
-                t.createdAt > Date.now() - 30 * 24 * 60 * 60 * 1000 &&
-                t.type === 'debit'
-              ).reduce((sum: number, t: any) => sum + t.amount, 0) || 0}
+              {creditHistory
+                ?.filter(
+                  (t: any) =>
+                    t.createdAt > Date.now() - 30 * 24 * 60 * 60 * 1000 &&
+                    t.type === "debit"
+                )
+                .reduce((sum: number, t: any) => sum + t.amount, 0) || 0}
             </div>
-            <div className="text-xs text-muted-foreground">
-              Credits used
-            </div>
+            <div className="text-xs text-muted-foreground">Credits used</div>
           </CardContent>
         </Card>
       </div>
@@ -107,21 +129,25 @@ export function CreditsDashboard() {
             <History className="h-5 w-5" />
             Recent Activity
           </CardTitle>
-          <CardDescription>
-            Your latest credit transactions
-          </CardDescription>
+          <CardDescription>Your latest credit transactions</CardDescription>
         </CardHeader>
         <CardContent>
           {creditHistory && creditHistory.length > 0 ? (
             <div className="space-y-3">
               {creditHistory.slice(0, 8).map((transaction: any) => (
-                <div key={transaction._id} className="flex items-center justify-between py-2 border-b last:border-0">
+                <div
+                  key={transaction._id}
+                  className="flex items-center justify-between py-2 border-b last:border-0"
+                >
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${transaction.type === 'credit'
-                      ? 'bg-green-100 text-green-600'
-                      : 'bg-red-100 text-red-600'
-                      }`}>
-                      {transaction.type === 'credit' ? (
+                    <div
+                      className={`p-2 rounded-full ${
+                        transaction.type === "credit"
+                          ? "bg-green-100 text-green-600"
+                          : "bg-red-100 text-red-600"
+                      }`}
+                    >
+                      {transaction.type === "credit" ? (
                         <TrendingUp className="h-4 w-4" />
                       ) : (
                         <TrendingDown className="h-4 w-4" />
@@ -129,17 +155,25 @@ export function CreditsDashboard() {
                     </div>
                     <div>
                       <div className="font-medium capitalize">
-                        {transaction.reason.replace(/_/g, ' ')}
+                        {transaction.reason.replace(/_/g, " ")}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {formatDistanceToNow(new Date(transaction.createdAt), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(transaction.createdAt), {
+                          addSuffix: true,
+                        })}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className={`font-medium ${transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                      {transaction.type === 'credit' ? '+' : '-'}{transaction.amount}
+                    <div
+                      className={`font-medium ${
+                        transaction.type === "credit"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {transaction.type === "credit" ? "+" : "-"}
+                      {transaction.amount}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       Balance: {transaction.balanceAfter}
@@ -152,7 +186,9 @@ export function CreditsDashboard() {
             <div className="text-center py-8 text-muted-foreground">
               <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>No transactions yet</p>
-              <p className="text-sm">Start generating images or videos to see your activity here</p>
+              <p className="text-sm">
+                Start generating images or videos to see your activity here
+              </p>
             </div>
           )}
         </CardContent>
@@ -169,15 +205,16 @@ export function CreditsDashboard() {
               <div className="flex-1">
                 <h3 className="font-semibold">Need More Credits?</h3>
                 <p className="text-sm text-muted-foreground">
-                  {userCredits.subscriptionPlan === 'free'
-                    ? 'Upgrade to a paid plan for more credits'
-                    : 'Top up your account with additional credits'
-                  }
+                  {userCredits.subscriptionPlan === "free"
+                    ? "Upgrade to a paid plan for more credits"
+                    : "Top up your account with additional credits"}
                 </p>
               </div>
               <Link href="/pricing">
                 <Button>
-                  {userCredits.subscriptionPlan === 'free' ? 'Upgrade' : 'Top Up'}
+                  {userCredits.subscriptionPlan === "free"
+                    ? "Upgrade"
+                    : "Top Up"}
                 </Button>
               </Link>
             </div>
@@ -196,9 +233,7 @@ export function CreditsDashboard() {
                   View billing history and manage your plan
                 </p>
               </div>
-              <Button variant="outline">
-                Manage
-              </Button>
+              <Button variant="outline">Manage</Button>
             </div>
           </CardContent>
         </Card>
