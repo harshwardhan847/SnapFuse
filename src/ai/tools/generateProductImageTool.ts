@@ -36,10 +36,7 @@ export const generateProductImageTool: Tool = {
    */
   execute: async ({ inputStorageId, prompt, userId }) => {
     try {
-      const baseUrl =
-        process.env.APP_BASE_URL ||
-        process.env.APP_BASE_URL ||
-        "http://localhost:3000";
+      const baseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
       const response = await fetch(`${baseUrl}/api/generate-image`, {
         method: "POST",
         body: JSON.stringify({

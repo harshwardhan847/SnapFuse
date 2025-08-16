@@ -1,21 +1,29 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 const isPublicRoute = createRouteMatcher(["/", "/api/webhooks(.*)"]);
+const isApiRoute = createRouteMatcher(["/", "/api(.*)"]);
 // const ignoredRoutes = createRouteMatcher(["/chatbot"]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
-  if (!userId && !isPublicRoute(req)) {
-    // Add custom logic to run before redirecting
 
+  if (isPublicRoute(req)) {
+    if (userId) {
+      return NextResponse.redirect(new URL("/dashboard/home", req.url));
+    }
+    return;
+  }
+
+  if (!userId && isApiRoute(req)) {
+    // Instead of redirect, send 401 for APIs
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (userId) {
+    await auth.protect();
+  } else {
     return NextResponse.redirect(new URL("/", req.url));
   }
-  if (userId && req.url === "/") {
-    return NextResponse.redirect(new URL("/dashboard/home", req.url));
-  }
-  if (!isPublicRoute(req)) {
-    await auth.protect();
-  }
+
   // if (ignoredRoutes(req)) {
   //   return;
   // }
