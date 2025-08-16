@@ -5,6 +5,7 @@ import { motion, AnimatePresence, easeInOut } from "framer-motion";
 import { Menu, X, Zap } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "../theme-toggle";
+import Image from "next/image";
 
 interface NavItem {
   name: string;
@@ -96,18 +97,17 @@ export default function Header2() {
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
             >
               <Link href="/" className="flex items-center space-x-3">
-                <div className="relative">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 via-rose-600 to-rose-700 shadow-lg">
-                    <Zap className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 h-3 w-3 animate-pulse rounded-full bg-green-400"></div>
-                </div>
+                <div className="relative"></div>
                 <div className="flex flex-col">
-                  <span className="text-foreground text-lg font-bold">
-                    SnapFuse
-                  </span>
-                  <span className="text-muted-foreground -mt-1 text-xs">
-                    Publish Faster
+                  <Image
+                    src={"/logos/logo_black.jpeg"}
+                    alt="Logo"
+                    width={100}
+                    height={100}
+                    className="object-cover mix-blend-multiply bg-blend-multiply"
+                  />
+                  <span className="text-muted-foreground sr-only -mt-1 text-xs">
+                    Unleash Product Brilliance
                   </span>
                 </div>
               </Link>
