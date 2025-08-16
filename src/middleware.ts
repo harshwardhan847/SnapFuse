@@ -2,6 +2,11 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 const isPublicRoute = createRouteMatcher(["/"]);
 const isApiRoute = createRouteMatcher(["/api(.*)"]);
+const isProtectedRoute = createRouteMatcher([
+  "/dashboard(.*)",
+  "/success",
+  "/pricing",
+]);
 // const ignoredRoutes = createRouteMatcher(["/chatbot"]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -20,7 +25,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
   if (userId) {
     await auth.protect();
-  } else {
+  } else if (isProtectedRoute(req)) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
