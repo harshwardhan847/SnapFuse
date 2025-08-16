@@ -14,12 +14,13 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  // { name: 'Home', href: '/' },
-  // { name: 'Features', href: '/features' },
-  // { name: 'Solutions', href: '/solutions' },
-  // { name: 'Pricing', href: '/pricing' },
-  // { name: 'Resources', href: '/resources' },
-  // { name: 'Contact', href: '/contact' },
+  { name: "Home", href: "/" },
+  { name: "Features", href: "#features" },
+  // { name: "Solutions", href: "" },
+  { name: "Pricing", href: "#pricing" },
+  // { name: "Resources", href: "" },
+  { name: "Contact", href: "#cta" },
+  { name: "FAQ", href: "#faq" },
 ];
 
 export default function Header2() {

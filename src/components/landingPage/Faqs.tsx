@@ -161,7 +161,10 @@ export default function Faq() {
     },
   ];
   return (
-    <section className="bg-background dark relative w-full overflow-hidden py-16">
+    <section
+      id="faq"
+      className="bg-background dark relative w-full overflow-hidden py-16"
+    >
       {/* Decorative elements */}
       <div className="bg-primary/5 absolute top-20 -left-20 h-64 w-64 rounded-full blur-3xl" />
       <div className="bg-primary/5 absolute -right-20 bottom-20 h-64 w-64 rounded-full blur-3xl" />

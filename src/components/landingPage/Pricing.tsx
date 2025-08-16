@@ -222,6 +222,7 @@ export default function PricingSection() {
 
   return (
     <section
+      id="pricing"
       data-theme="dark"
       className="flex flex-col dark items-center gap-10 py-10"
     >

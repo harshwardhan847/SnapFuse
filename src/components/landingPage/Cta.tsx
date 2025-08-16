@@ -5,7 +5,7 @@ import { calendlyLink } from "@/constants";
 
 export default function CTA() {
   return (
-    <div className="w-full dark">
+    <div className="w-full dark" id="cta">
       <section className="mx-auto max-w-7xl px-4 py-6 lg:px-8 lg:py-20">
         <div
           className="relative isolate w-full overflow-hidden rounded-2xl"
