@@ -44,7 +44,7 @@ export default function ContactUs() {
   };
 
   return (
-    <section className="bg-background relative w-full overflow-hidden py-16 md:py-24">
+    <section className="bg-background dark relative w-full overflow-hidden py-16 md:py-24">
       <div
         className="absolute top-0 left-0 h-[500px] w-[500px] rounded-full opacity-20 blur-[120px]"
         style={{
@@ -94,9 +94,9 @@ export default function ContactUs() {
                 }
                 transition={{ duration: 0.5, delay: 0.3 }}
                 onSubmit={handleSubmit}
-                className="mt-8 space-y-6"
+                className="mt-8 space-y-6 dark:text-white"
               >
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="grid grid-cols-1  gap-6 md:grid-cols-2">
                   <motion.div
                     className="space-y-2"
                     initial={{ opacity: 0, y: 10 }}

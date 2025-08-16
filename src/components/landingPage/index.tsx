@@ -16,25 +16,25 @@ type Props = {};
 
 const LandingPage = (props: Props) => {
   return (
-    <div className="min-h-screen">
+    <div className="dark min-h-screen bg-background">
       <Header2 />
       <Hero />
-
       <Users />
       <Feature />
-      <VelocityScroll
-        className="px-6 text-center text-4xl font-bold tracking-tight md:text-7xl md:leading-[5rem]"
-        text="Welcome to SnapFuse"
-        default_velocity={5}
-      />
-      <div className="mx-auto w-full">
+
+      {/* <div className="mx-auto w-full">
         <Testimonials />
-      </div>
+      </div> */}
+      <VelocityScroll
+        className="px-6 text-center dark dark:text-white text-4xl font-bold tracking-tight md:text-7xl md:leading-[5rem]"
+        text="Welcome to SnapFuse — AI that empowers your listings."
+        default_velocity={3}
+      />
       <CTA />
       <PricingSection />
-      <Team6 teamMembers={[]} />
+      {/* <Team6 teamMembers={[]} /> */}
 
-      <ContactUs />
+      {/* <ContactUs /> */}
       <Faq />
       <FooterGlow />
     </div>

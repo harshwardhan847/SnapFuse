@@ -14,10 +14,7 @@ export function Highlight({
 }) {
   return (
     <span
-      className={cn(
-        "bg-blue-500/10 p-1 py-0.5 font-bold text-blue-500",
-        className
-      )}
+      className={cn("bg-red-500/50 p-1 py-0.5 font-bold text-white", className)}
     >
       {children}
     </span>
@@ -56,11 +53,11 @@ export function TestimonialCard({
       <div className="text-muted-foreground text-sm font-normal select-none">
         {description}
         <div className="flex flex-row py-1">
-          <Star className="size-4 fill-blue-500 text-blue-500" />
-          <Star className="size-4 fill-blue-500 text-blue-500" />
-          <Star className="size-4 fill-blue-500 text-blue-500" />
-          <Star className="size-4 fill-blue-500 text-blue-500" />
-          <Star className="size-4 fill-blue-500 text-blue-500" />
+          <Star className="size-4 fill-amber-500 text-amber-500" />
+          <Star className="size-4 fill-amber-500 text-amber-500" />
+          <Star className="size-4 fill-amber-500 text-amber-500" />
+          <Star className="size-4 fill-amber-500 text-amber-500" />
+          <Star className="size-4 fill-amber-500 text-amber-500" />
         </div>
       </div>
 
@@ -248,11 +245,11 @@ export default function Testimonials() {
         </h2>
         <h3 className="text-muted-foreground mx-auto mb-8 max-w-lg text-center text-lg font-medium tracking-tight text-balance">
           Don&apos;t just take our word for it. Here&apos;s what{" "}
-          <span className="bg-gradient-to-r from-blue-500 to-sky-500 bg-clip-text text-transparent">
-            real developers
+          <span className="bg-gradient-to-r from-red-500 to-rose-500 bg-clip-text text-transparent">
+            real e-commerce owners
           </span>{" "}
           are saying about{" "}
-          <span className="font-semibold text-blue-500">NexaUI</span>
+          <span className="font-semibold text-red-500">SnapFuse</span>
         </h3>
       </motion.div>
 

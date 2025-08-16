@@ -41,6 +41,19 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  --animate-marquee:marquee var(--duration) linear infinite;
+  --animate-marquee-vertical:marquee-vertical var(--duration) linear infinite;
+
+  @keyframes marquee {
+      0% { transform: "translateX(0)" }
+      100% { transform: "translateX(calc(-100% - var(--gap)))" }
+  }
+  @keyframes marquee-vertical  {
+    0% { transform: "translateY(0)" }
+    100% { transform: "translateY(calc(-100% - var(--gap)))" }
+  }
+
 }
 
 :root {
@@ -51,7 +64,7 @@
   --card-foreground: #09090B;
   --popover: #FFFFFF;
   --popover-foreground: #09090B;
-  --primary: #DE2F4F  ;
+  --primary: #DE2F4F;
   --primary-foreground: #FFF1F2;
   --secondary: #F4F4F5;
   --secondary-foreground: #18181B;

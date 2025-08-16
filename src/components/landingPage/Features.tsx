@@ -22,25 +22,25 @@ type FeatureItem = {
 const leftFeatures: FeatureItem[] = [
   {
     icon: Building2,
-    title: "Taught by Professionals",
+    title: "AI-Powered Images",
     description:
-      "Learn directly from top engineers and founders with real-world experience.",
+      "Transform ordinary product photos into high-impact, studio-quality images with one click.",
     position: "left",
     cornerStyle: "sm:translate-x-4 sm:rounded-br-[2px]",
   },
   {
     icon: User2,
-    title: "Coding Hostels",
+    title: "Instant Product Videos",
     description:
-      "Join virtual hostels to study, collaborate, and vibe with fellow learners.",
+      "Turn your images into 10-second, professional-grade videos—perfect for ads, social media, and product pages.",
     position: "left",
     cornerStyle: "sm:-translate-x-4 sm:rounded-br-[2px]",
   },
   {
     icon: Trophy,
-    title: "Bounties",
+    title: "SEO-Optimized Descriptions",
     description:
-      "Win rewards for solving challenges, contributing to projects, and helping peers.",
+      "Let AI craft compelling and search-ready product titles, bullet points, and descriptions that convert.",
     position: "left",
     cornerStyle: "sm:translate-x-4 sm:rounded-tr-[2px]",
   },
@@ -49,25 +49,25 @@ const leftFeatures: FeatureItem[] = [
 const rightFeatures: FeatureItem[] = [
   {
     icon: ScreenShare,
-    title: "Revision Classes",
+    title: "Social-Ready Content",
     description:
-      "Stay sharp with weekly revision sessions and topic refreshers.",
+      "Instantly generate captions, posts, and content for all leading social media platforms—consistently on brand, always fresh.",
     position: "right",
     cornerStyle: "sm:-translate-x-4 sm:rounded-bl-[2px]",
   },
   {
     icon: User,
-    title: "Peer Code Reviews",
+    title: "Seamless Workflow",
     description:
-      "Improve faster with feedback from mentors and batchmates on your actual code.",
+      "Save time, cut costs, and go live faster—ditch expensive agencies and content bottlenecks for good.",
     position: "right",
     cornerStyle: "sm:translate-x-4 sm:rounded-bl-[2px]",
   },
   {
     icon: Lightbulb,
-    title: "Leet Lab",
+    title: "AI Agent",
     description:
-      "Ace coding interviews with daily DSA problems, contests, and tracking.",
+      "Ask and just wait and our AI agent will do the handling. No need to switch tabs and clicks.",
     position: "right",
     cornerStyle: "sm:-translate-x-4 sm:rounded-tl-[2px]",
   },
@@ -78,7 +78,7 @@ const FeatureCard = ({ feature }: { feature: FeatureItem }) => {
   const Icon = feature.icon;
 
   return (
-    <div>
+    <div className="dark">
       <div
         className={cn(
           "relative rounded-2xl px-4 pt-4 pb-4 text-sm",
@@ -123,11 +123,10 @@ export default function Feature() {
               <span className="absolute inset-0 bg-[radial-gradient(30%_40%_at_50%_100%,hsl(var(--primary)/0.25)_0%,transparent_100%)]"></span>
             </div>
             <h2 className="text-foreground mb-2 text-center text-2xl sm:mb-2.5 md:text-[2rem]">
-              Key Benefits of Cohorts
+              Why Choose SnapFuse?
             </h2>
             <p className="text-muted-foreground mx-auto max-w-[18rem] text-center text-pretty">
-              Cohorts are best way to learn because you finish the course in a
-              timely manner
+              No graphic designer, video editor, or copywriter required.
             </p>
           </div>
 

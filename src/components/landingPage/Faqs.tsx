@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { calendlyLink } from "@/constants";
 
 interface FAQItemProps {
   question: string;
@@ -118,34 +120,48 @@ function FAQItem({ question, answer, index }: FAQItemProps) {
 export default function Faq() {
   const faqs: Omit<FAQItemProps, "index">[] = [
     {
-      question: "What makes MVPBlocks unique?",
+      question: "What makes SnapFuse unique?",
       answer:
-        "MVPBlocks stands out through its intuitive design, powerful component library, and seamless integration options. We've focused on creating a user experience that combines simplicity with advanced features, all while maintaining excellent performance and accessibility.",
+        "SnapFuse sets itself apart by instantly generating high-quality, SEO-optimized product content, AI-powered studio images, and professional videos—all in one platform. Unlike traditional solutions, SnapFuse eliminates the need for separate writers, designers, and video editors, saving you time and cost while dramatically accelerating your eCommerce growth.",
     },
     {
-      question: "How can I customize the components?",
+      question: "How do I customize the AI-generated content?",
       answer:
-        "All components are built with Tailwind CSS, making them highly customizable. You can modify colors, spacing, typography, and more by simply adjusting the class names or using our theme variables to match your brand identity.",
+        "You have full control over your listing. Simply enter your product details and preferences, and SnapFuse will generate previews for review and edit before finalizing. You can refine titles, images, descriptions, and even select styles for product visuals until you’re completely satisfied with each listing.",
     },
     {
-      question: "Do the components work with dark mode?",
+      question: "Does SnapFuse support major eCommerce platforms?",
       answer:
-        "Yes, all MVPBlocks components are designed to work seamlessly with both light and dark modes. They automatically adapt to your site's theme settings, providing a consistent user experience regardless of the user's preference.",
+        "Yes, SnapFuse is designed to work seamlessly with leading eCommerce platforms and marketplaces. You can easily copy and download content for direct use on Amazon, Shopify, WooCommerce, Flipkart, and more, with formats optimized for each channel.",
     },
     {
-      question: "How can I get started with MVPBlocks?",
+      question: "How do I get started with SnapFuse?",
       answer:
-        "You can get started by browsing our component library and copying the code for the components you need. Our documentation provides clear instructions for installation and usage, and you can always reach out to our support team if you need assistance.",
+        "Just sign up for a free account, add your product details, and let SnapFuse’s AI generate content instantly. From there, review, customize as needed, and publish or export your catalog—no technical skills required.",
     },
     {
-      question: "Can I use MVPBlocks for commercial projects?",
+      question: "Can SnapFuse handle large catalogs or enterprise needs?",
       answer:
-        "Absolutely! MVPBlocks is free to use for both personal and commercial projects. There are no licensing fees or attribution requirements—just build and launch your MVP faster than ever before.",
+        "Absolutely. SnapFuse scales effortlessly for both small sellers and enterprise brands. Advanced batch processing, team collaboration, and API integration options are available for businesses with large or rapidly growing catalogs.",
+    },
+    {
+      question: "Is SnapFuse suitable for non-English product listings?",
+      answer:
+        "SnapFuse currently supports English product generation. We are actively expanding to additional languages and plan to introduce multilingual support soon.",
+    },
+    {
+      question: "How secure is my product data with SnapFuse?",
+      answer:
+        "SnapFuse prioritizes your privacy and security. All product data and images are encrypted and never shared without your consent. Our platform adheres to industry-standard security practices for your peace of mind.",
+    },
+    {
+      question: "Does SnapFuse offer a free trial?",
+      answer:
+        "Yes! You can start for free with no credit card required. Our free plan gives you immediate access to core features—try SnapFuse risk-free and upgrade anytime to unlock advanced capabilities and higher usage limits.",
     },
   ];
-
   return (
-    <section className="bg-background relative w-full overflow-hidden py-16">
+    <section className="bg-background dark relative w-full overflow-hidden py-16">
       {/* Decorative elements */}
       <div className="bg-primary/5 absolute top-20 -left-20 h-64 w-64 rounded-full blur-3xl" />
       <div className="bg-primary/5 absolute -right-20 bottom-20 h-64 w-64 rounded-full blur-3xl" />
@@ -193,8 +209,9 @@ export default function Faq() {
           <p className="text-muted-foreground mb-4 text-xs">
             We&apos;re here to help you
           </p>
-          <button
-            type="button"
+          <Link
+            href={calendlyLink}
+            target="_blank"
             className={cn(
               "rounded-md px-4 py-2 text-sm",
               "bg-primary text-primary-foreground",
@@ -204,7 +221,7 @@ export default function Faq() {
             )}
           >
             Contact Support
-          </button>
+          </Link>
         </motion.div>
       </div>
     </section>

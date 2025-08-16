@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, easeInOut } from "framer-motion";
-import { Menu, X, Zap } from "lucide-react";
+import { ArrowRight, Menu, X, Zap } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "../theme-toggle";
 import Image from "next/image";
+import { useClerk, UserButton } from "@clerk/nextjs";
 
 interface NavItem {
   name: string;
@@ -25,6 +26,7 @@ export default function Header2() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const { openSignIn, openSignUp, isSignedIn } = useClerk();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,7 +81,7 @@ export default function Header2() {
   return (
     <>
       <motion.header
-        className={`fixed top-0 right-0 left-0 z-50 transition-all duration-500 ${
+        className={`fixed dark top-0 right-0 left-0 z-50 transition-all duration-500 ${
           isScrolled
             ? "border-border/50 bg-background/80 border-b shadow-sm backdrop-blur-md"
             : "bg-transparent"
@@ -104,7 +106,7 @@ export default function Header2() {
                     alt="Logo"
                     width={100}
                     height={100}
-                    className="object-cover mix-blend-multiply bg-blend-multiply"
+                    className="object-cover invert "
                   />
                   <span className="text-muted-foreground sr-only -mt-1 text-xs">
                     Unleash Product Brilliance
@@ -146,44 +148,50 @@ export default function Header2() {
               ))}
             </nav>
 
-            <motion.div
-              className="hidden items-center space-x-3 lg:flex"
-              variants={itemVariants}
-            >
-              <ThemeToggle />
-            </motion.div>
             {/* <motion.div
               className="hidden items-center space-x-3 lg:flex"
               variants={itemVariants}
             >
-              <motion.button
+              <ThemeToggle />
+            </motion.div> */}
+            <motion.div
+              className="hidden items-center space-x-3 lg:flex"
+              variants={itemVariants}
+            >
+              {!isSignedIn ? (
+                <>
+                  {/* <motion.button
                 className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg p-2 transition-colors duration-200"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Search className="h-5 w-5" />
-              </motion.button>
+              </motion.button> */}
 
-              <Link
-                href="/login"
-                className="text-foreground/80 hover:text-foreground px-4 py-2 text-sm font-medium transition-colors duration-200"
-              >
-                Sign In
-              </Link>
+                  <button
+                    onClick={() => openSignIn()}
+                    className="text-foreground/80 hover:text-foreground px-4 py-2 text-sm font-medium transition-colors duration-200"
+                  >
+                    Sign In
+                  </button>
 
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Link
-                  href="/signup"
-                  className="bg-foreground text-background hover:bg-foreground/90 inline-flex items-center space-x-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm transition-all duration-200"
-                >
-                  <span>Get Started</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </motion.div>
-            </motion.div> */}
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <button
+                      onClick={() => openSignUp()}
+                      className="bg-foreground text-background hover:bg-foreground/90 inline-flex items-center space-x-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm transition-all duration-200"
+                    >
+                      <span>Get Started</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                  </motion.div>
+                </>
+              ) : (
+                <UserButton />
+              )}
+            </motion.div>
 
             <motion.button
               className="text-foreground hover:bg-muted rounded-lg p-2 transition-colors duration-200 lg:hidden"

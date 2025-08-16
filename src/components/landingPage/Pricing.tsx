@@ -147,7 +147,7 @@ const PricingCard = ({
   return (
     <div
       className={cn(
-        "relative flex flex-col gap-8 overflow-hidden rounded-2xl border p-6 shadow",
+        "relative flex flex-col dark gap-8 overflow-hidden rounded-2xl border p-6 shadow",
         isHighlighted
           ? "bg-foreground text-background"
           : "bg-background text-foreground",
@@ -221,10 +221,13 @@ export default function PricingSection() {
   >(PAYMENT_FREQUENCIES[0]);
 
   return (
-    <section className="flex flex-col items-center gap-10 py-10">
-      <div className="space-y-7 text-center">
+    <section
+      data-theme="dark"
+      className="flex flex-col dark items-center gap-10 py-10"
+    >
+      <div className="space-y-7 text-center dark:text-white">
         <div className="space-y-4">
-          <h1 className="text-4xl font-medium md:text-5xl">
+          <h1 className="text-4xl  font-medium md:text-5xl">
             Plans and Pricing
           </h1>
           <p>
