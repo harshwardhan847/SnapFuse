@@ -1,6 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Markdown } from "@/components/markdown";
-import { UIMessage } from "ai";
+import {
+  DataUIPart,
+  FileUIPart,
+  ReasoningUIPart,
+  TextUIPart,
+  ToolCallPart,
+  ToolUIPart,
+  UIDataTypes,
+  UIMessage,
+  UIMessagePart,
+  UITools,
+} from "ai";
 import SeoContent from "@/app/dashboard/seo/_components/seo-content";
 import { seoContentSchema } from "@/ai/schema";
 import z from "zod";
@@ -786,6 +797,14 @@ const PromptFromImageForVideoToolPart = ({ part }: { part: any }) => {
 };
 
 const ToolPart = ({ part }: { part: any }) => {
+  if (part.state === "input-streaming" || part.state === "input-available") {
+    return (
+      <div className="text-foreground font-semibold text-lg">Thinking...</div>
+    );
+  }
+  if (part.state === "output-error") {
+    return <div key={part.toolCallId + part.state}>{part.errorText}</div>;
+  }
   switch (part.type) {
     case "tool-generateSeoReadyContent":
       return (
@@ -812,13 +831,28 @@ const ToolPart = ({ part }: { part: any }) => {
   }
 };
 
-const MessagePart = ({ part }: { part: any }) => {
+const MessagePart = ({
+  part,
+}: {
+  part:
+    | UIMessagePart<UIDataTypes, UITools>
+    | { type: "image"; storage_id: string };
+}) => {
   switch (part.type) {
     case "text":
       return <TextPart text={part.text} />;
     case "image":
       return <ImagePart storageId={part.storage_id} />;
+    case "reasoning":
+      return null;
+    // case "step-start":
+    //   return "Starting...";
     default:
+      if (part.type === "source-document") return null;
+      if (part.type === "source-url") return null;
+      if (part.type === "dynamic-tool") return null;
+      if (part.type === "file") return null;
+      if (part.type?.startsWith("data-")) return null;
       if (part.type?.startsWith("tool-")) {
         return <ToolPart part={part} />;
       }

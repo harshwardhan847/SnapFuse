@@ -4,7 +4,7 @@ export default function Users() {
   return (
     <div className="h-[90%] w-screen overflow-hidden bg-background">
       <div className="mx-auto mt-20 w-screen max-w-3xl">
-        <div className="text-center text-3xl text-white">
+        <div className="text-center text-xl md:text-3xl text-white">
           <span className="text-rose-200">Trusted by eCommerce sellers.</span>
 
           <br />
@@ -12,14 +12,17 @@ export default function Users() {
           <span>Used by the leaders.</span>
         </div>
 
-        <div className="mt-14 grid grid-cols-4 text-xl font-semibold w-full">
+        <div className="mt-14 grid grid-cols-2 gap-4 md:gap-0 md:grid-cols-4 text-xl font-semibold w-full">
           {[
             "D2C founders",
             "Marketplace sellers",
             "Digital brands",
             "Enterprise sellers",
           ].map((text) => (
-            <div key={text} className="w-full text-center text-white">
+            <div
+              key={text}
+              className="w-full text-center text-xs md:text-base text-white"
+            >
               {text}
             </div>
           ))}

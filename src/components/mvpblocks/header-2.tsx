@@ -27,7 +27,6 @@ export default function Header2() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const { openSignIn, openSignUp, isSignedIn } = useClerk();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -155,44 +154,7 @@ export default function Header2() {
             >
               <ThemeToggle />
             </motion.div> */}
-            <motion.div
-              className="hidden items-center space-x-3 lg:flex"
-              variants={itemVariants}
-            >
-              {!isSignedIn ? (
-                <>
-                  {/* <motion.button
-                className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg p-2 transition-colors duration-200"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Search className="h-5 w-5" />
-              </motion.button> */}
-
-                  <button
-                    onClick={() => openSignIn()}
-                    className="text-foreground/80 hover:text-foreground px-4 py-2 text-sm font-medium transition-colors duration-200"
-                  >
-                    Sign In
-                  </button>
-
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <button
-                      onClick={() => openSignUp()}
-                      className="bg-foreground text-background hover:bg-foreground/90 inline-flex items-center space-x-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm transition-all duration-200"
-                    >
-                      <span>Get Started</span>
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
-                  </motion.div>
-                </>
-              ) : (
-                <UserButton />
-              )}
-            </motion.div>
+            <AuthButtons className="lg:flex hidden" />
 
             <motion.button
               className="text-foreground hover:bg-muted rounded-lg p-2 transition-colors duration-200 lg:hidden"
@@ -241,13 +203,13 @@ export default function Header2() {
                     </motion.div>
                   ))}
                 </div>
-
-                <motion.div
+                <AuthButtons className="items-stretch" />
+                {/* <motion.div
                   className="border-border space-y-3 border-t pt-6"
                   variants={mobileItemVariants}
                 >
                   <ThemeToggle />
-                </motion.div>
+                </motion.div> */}
                 {/* <motion.div
                   className="border-border space-y-3 border-t pt-6"
                   variants={mobileItemVariants}
@@ -275,3 +237,53 @@ export default function Header2() {
     </>
   );
 }
+
+const AuthButtons = ({ className }: { className?: string }) => {
+  const itemVariants = {
+    hidden: { opacity: 0, y: -10 },
+    visible: { opacity: 1, y: 0 },
+  };
+  const { openSignIn, openSignUp, isSignedIn } = useClerk();
+
+  return (
+    <motion.div
+      className={`flex flex-col lg:flex-row items-center space-x-3 lg:flex ${className}`}
+      variants={itemVariants}
+    >
+      {isSignedIn ? (
+        <UserButton />
+      ) : (
+        <>
+          {/* <motion.button
+    className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg p-2 transition-colors duration-200"
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+  >
+    <Search className="h-5 w-5" />
+  </motion.button> */}
+
+          <button
+            onClick={() => openSignIn()}
+            className="text-foreground/80 hover:text-foreground px-4 py-2 text-sm font-medium transition-colors duration-200"
+          >
+            Sign In
+          </button>
+
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className=""
+          >
+            <button
+              onClick={() => openSignUp()}
+              className="bg-foreground w-full lg:w-auto justify-center text-background hover:bg-foreground/90 inline-flex items-center space-x-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm transition-all duration-200"
+            >
+              <span>Get Started</span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </motion.div>
+        </>
+      )}
+    </motion.div>
+  );
+};

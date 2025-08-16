@@ -23,10 +23,10 @@ export default function CTA() {
             src="/assets/cta/grid.svg"
           /> */}
           <div className="relative isolate overflow-hidden px-4 py-12 sm:px-24">
-            <p className="w-fit rounded-xl bg-white px-4 py-1 text-center text-base leading-7 font-semibold text-black uppercase lg:text-left">
+            <p className="w-fit rounded-xl bg-white px-4 py-1 text-center text-xs md:text-base leading-7 font-semibold text-black uppercase lg:text-left">
               Unleash Product Brilliance{" "}
             </p>
-            <h2 className="mt-3 max-w-3xl text-4xl font-semibold text-white md:text-6xl">
+            <h2 className="mt-3 max-w-3xl text-2xl font-semibold text-white md:text-6xl">
               Ready to Dazzle Your Customers and Sell More?
             </h2>
             <p className="my-auto mt-3 max-w-2xl text-base text-gray-300 md:text-lg">
@@ -49,7 +49,7 @@ export default function CTA() {
                 harshwardhan847@gmail.com
               </a> */}
               <a
-                className="flex items-center gap-2 text-white"
+                className="flex items-center text-xs md:text-base gap-2 text-white"
                 href="tel:+91-7988543957"
               >
                 <Phone className="h-7 w-7 text-green-500" />

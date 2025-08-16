@@ -27,7 +27,7 @@ export default function Hero() {
               </span>
             </h2>
 
-            <p className="mx-auto max-w-2xl text-gray-300">
+            <p className="mx-auto max-w-2xl text-gray-300 leading-normal">
               Unlock instant, studio-quality images, videos, and SEO-ready
               product content
             </p>

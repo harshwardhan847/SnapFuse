@@ -228,10 +228,10 @@ export default function PricingSection() {
     >
       <div className="space-y-7 text-center dark:text-white">
         <div className="space-y-4">
-          <h1 className="text-4xl  font-medium md:text-5xl">
+          <h1 className="text-2xl  font-medium md:text-5xl">
             Plans and Pricing
           </h1>
-          <p>
+          <p className="md:text-base text-sm md:max-w-full max-w-xs">
             Receive unlimited credits when you pay yearly, and save on your
             plan.
           </p>
@@ -251,7 +251,7 @@ export default function PricingSection() {
         </div>
       </div>
 
-      <div className="grid w-full max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      <div className="grid px-4 md:px-0 w-full max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         {TIERS.map((tier, i) => (
           <PricingCard
             key={i}

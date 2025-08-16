@@ -118,7 +118,7 @@ const VideoPage = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <h1 className="text-3xl font-bold">Video Generation</h1>
