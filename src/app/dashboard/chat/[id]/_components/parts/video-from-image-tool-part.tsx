@@ -92,17 +92,11 @@ const VideoFromImageToolPart = ({ part }: { part: any }) => {
                     alt={"generated Image"}
                     width={128}
                     height={128}
-                    className={`object-cover w-full h-full ${derivedProcessing ? "blur-sm" : ""
-                      }`}
+                    className={`object-cover w-full h-full `}
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">
                     <Loader className="h-4 w-4 animate-spin" />
-                  </div>
-                )}
-                {derivedProcessing && (
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                    <Loader className="h-6 w-6 animate-spin text-white" />
                   </div>
                 )}
               </div>
