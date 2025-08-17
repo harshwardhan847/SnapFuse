@@ -60,12 +60,12 @@ const menuItems = [
     href: "/dashboard/image",
     planRequired: null,
   },
-  {
-    title: "Settings",
-    icon: Settings,
-    href: "/dashboard/settings",
-    planRequired: null,
-  },
+  // {
+  //   title: "Settings",
+  //   icon: Settings,
+  //   href: "/dashboard/settings",
+  //   planRequired: null,
+  // },
 ];
 
 const premiumMenuItems = [

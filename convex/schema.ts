@@ -17,6 +17,39 @@ export default defineSchema({
     stripeSubscriptionId: v.optional(v.string()),
     subscriptionStatus: v.optional(v.string()), // active, canceled, past_due, etc.
     subscriptionPeriodEnd: v.optional(v.number()), // Unix timestamp
+    // Onboarding and preferences
+    onboardingCompleted: v.optional(v.boolean()),
+    company: v.optional(v.string()),
+    role: v.optional(v.string()),
+    industry: v.optional(v.string()),
+    teamSize: v.optional(v.string()),
+    primaryUseCase: v.optional(v.string()),
+    goals: v.optional(v.array(v.string())),
+    experienceLevel: v.optional(v.string()),
+    contentTypes: v.optional(v.array(v.string())),
+    qualityPreference: v.optional(v.string()),
+    // Generation preferences
+    defaultImageStyle: v.optional(v.string()),
+    defaultImageSize: v.optional(v.string()),
+    defaultVideoLength: v.optional(v.string()),
+    defaultVideoStyle: v.optional(v.string()),
+    creativityLevel: v.optional(v.number()),
+    autoSaveGenerations: v.optional(v.boolean()),
+    showWatermark: v.optional(v.boolean()),
+    nsfwFilter: v.optional(v.boolean()),
+    contentModeration: v.optional(v.boolean()),
+    // Notification preferences
+    emailNotifications: v.optional(v.boolean()),
+    pushNotifications: v.optional(v.boolean()),
+    smsNotifications: v.optional(v.boolean()),
+    generationComplete: v.optional(v.boolean()),
+    creditLowWarning: v.optional(v.boolean()),
+    subscriptionUpdates: v.optional(v.boolean()),
+    marketingEmails: v.optional(v.boolean()),
+    securityAlerts: v.optional(v.boolean()),
+    weeklyDigest: v.optional(v.boolean()),
+    creditThreshold: v.optional(v.number()),
+    notificationFrequency: v.optional(v.string()),
   })
     .index("byExternalId", ["externalId"])
     .index("byStripeCustomerId", ["stripeCustomerId"])

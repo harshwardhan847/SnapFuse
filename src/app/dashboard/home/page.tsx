@@ -5,6 +5,7 @@ import { CreditsDashboard } from "@/components/dashboard/credits-dashboard";
 import { ImageGenerator } from "@/components/generation/image-generator";
 import { VideoGenerator } from "@/components/generation/video-generator";
 import { SubscriptionStatus } from "@/components/subscription/subscription-status";
+import { NewUserWelcome } from "@/components/onboarding/new-user-welcome";
 
 import {
   Card,
@@ -63,6 +64,11 @@ export default function DashboardPage() {
           Welcome back, {user.firstName || user.username || "User"}! Manage your
           credits and generate content.
         </p>
+      </div>
+
+      {/* New User Welcome Banner */}
+      <div className="mb-6">
+        <NewUserWelcome />
       </div>
 
       <Suspense fallback={<DashboardSkeleton />}>

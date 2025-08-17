@@ -9,7 +9,7 @@ export const upsertFromClerk = mutation({
       .query("users")
       .withIndex("byExternalId", (q) => q.eq("externalId", data.id))
       .unique();
-    
+
     const userAttributes = {
       name: `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim(),
       email: data.email_addresses?.[0]?.email_address ?? "",
@@ -19,16 +19,17 @@ export const upsertFromClerk = mutation({
       image_url: data.image_url ?? null,
       updated_at: new Date().toISOString(),
     };
-    
+
     if (user === null) {
-      // New user - initialize with free plan credits
+      // New user - initialize with free plan credits and mark as needing onboarding
       await ctx.db.insert("users", {
         ...userAttributes,
         credits: SUBSCRIPTION_PLANS.FREE.credits,
         subscriptionPlan: 'free',
         subscriptionStatus: 'active',
+        onboardingCompleted: false, // New users need onboarding
       });
-      
+
       // Record initial credit transaction
       await ctx.db.insert("creditTransactions", {
         userId: data.id,
