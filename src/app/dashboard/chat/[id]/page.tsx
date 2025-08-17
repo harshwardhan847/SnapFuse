@@ -7,7 +7,7 @@ import Chat from "./_components/chat";
 import { usePaginatedQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { UIDataTypes, UIMessage, UITools } from "ai";
-import { Loader } from "lucide-react";
+import { Loader, Loader2 } from "lucide-react";
 
 export default function Page() {
   const params: { id: string } = useParams();
@@ -35,7 +35,7 @@ export default function Page() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-full flex-1 min-h-screen">
-        <Loader className="animate-spin" size={25} />
+        <Loader2 className="animate-spin text-primary" size={25} />
       </div>
     );
   }
@@ -47,7 +47,7 @@ export default function Page() {
   if (status === "LoadingFirstPage") {
     return (
       <div className="flex items-center justify-center w-full h-full flex-1 min-h-screen">
-        <Loader className="animate-spin" size={25} />
+        <Loader2 className="animate-spin text-primary" size={25} />
       </div>
     );
   }

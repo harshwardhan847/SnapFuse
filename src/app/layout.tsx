@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import RootProvider from "@/components/providers/root-provider";
 
+import { ClerkLoaded, ClerkLoading } from "@clerk/nextjs";
+import { Loader2 } from "lucide-react";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -28,7 +31,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <RootProvider>{children}</RootProvider>
+        <RootProvider>
+          <ClerkLoaded>{children}</ClerkLoaded>
+          <ClerkLoading>
+            <div className="flex items-center justify-center min-h-screen min-w-screen w-full h-full">
+              <Loader2 size={50} className="animate-spin text-primary" />
+            </div>
+          </ClerkLoading>
+        </RootProvider>
       </body>
     </html>
   );

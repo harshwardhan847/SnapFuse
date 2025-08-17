@@ -1,7 +1,7 @@
 import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "../../../../../../../convex/_generated/api";
-import { Download, Info, Loader } from "lucide-react";
+import { Download, Info, Loader, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 import {
@@ -78,7 +78,9 @@ const VideoFromImageToolPart = ({ part }: { part: any }) => {
       <div className="p-4 bg-muted/50 rounded-lg">
         <div className="flex items-center gap-2 mb-3">
           <Badge variant="outline">Product Video Generation</Badge>
-          {derivedProcessing && <Loader className="h-4 w-4 animate-spin" />}
+          {derivedProcessing && (
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          )}
         </div>
 
         <div className="flex gap-4">
@@ -96,7 +98,7 @@ const VideoFromImageToolPart = ({ part }: { part: any }) => {
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">
-                    <Loader className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   </div>
                 )}
               </div>
@@ -145,7 +147,7 @@ const VideoFromImageToolPart = ({ part }: { part: any }) => {
                 </>
               ) : derivedProcessing ? (
                 <div className="flex flex-col items-center gap-2">
-                  <Loader className="h-6 w-6 animate-spin" />
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
                   <span className="text-xs text-muted-foreground">
                     Generating...
                   </span>
@@ -234,7 +236,7 @@ const VideoFromImageToolPart = ({ part }: { part: any }) => {
                     />
                   ) : (
                     <div className="bg-muted/30 rounded-lg h-64 flex items-center justify-center">
-                      <Loader className="h-6 w-6 animate-spin" />
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
                     </div>
                   )}
                 </div>

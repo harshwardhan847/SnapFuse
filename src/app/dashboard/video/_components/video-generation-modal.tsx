@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader, Wand2, Sparkles, Video, Zap } from "lucide-react";
+import { Loader, Wand2, Sparkles, Video, Zap, Loader2 } from "lucide-react";
 import { useCredits } from "@/hooks/use-credits";
 import { InsufficientCreditsModal } from "@/components/credits/insufficient-credits-modal";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,11 @@ type Props = {
   onModalClose?: () => void;
 };
 
-const VideoGenerationModal = ({ userId, openModal = false, onModalClose }: Props) => {
+const VideoGenerationModal = ({
+  userId,
+  openModal = false,
+  onModalClose,
+}: Props) => {
   const [isDialogOpen, setIsDialogOpen] = useState(openModal);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -78,14 +82,14 @@ const VideoGenerationModal = ({ userId, openModal = false, onModalClose }: Props
       setIsDialogOpen(true);
 
       // Check for pre-filled image data from sessionStorage
-      const storedImageData = sessionStorage.getItem('videoGenerationImage');
+      const storedImageData = sessionStorage.getItem("videoGenerationImage");
       if (storedImageData) {
         try {
           const imageData = JSON.parse(storedImageData);
 
           // Set form values
           if (imageData.imageUrl) {
-            form.setValue('imageUrl', imageData.imageUrl);
+            form.setValue("imageUrl", imageData.imageUrl);
             setPreviewUrl(imageData.imageUrl);
           }
 
@@ -96,13 +100,13 @@ const VideoGenerationModal = ({ userId, openModal = false, onModalClose }: Props
           if (imageData.prompt) {
             // Generate a video-specific prompt based on the image prompt
             const videoPrompt = `Create a dynamic video animation of: ${imageData.prompt}. Add smooth motion and cinematic effects.`;
-            form.setValue('prompt', videoPrompt);
+            form.setValue("prompt", videoPrompt);
           }
 
           // Clear the stored data
-          sessionStorage.removeItem('videoGenerationImage');
+          sessionStorage.removeItem("videoGenerationImage");
         } catch (error) {
-          console.error('Error parsing stored image data:', error);
+          console.error("Error parsing stored image data:", error);
         }
       }
     }
@@ -148,7 +152,9 @@ const VideoGenerationModal = ({ userId, openModal = false, onModalClose }: Props
       }
 
       if (data.status === "processing") {
-        toast.success(`Video generation started! ${data.creditsDeducted} credits deducted. ${data.remainingCredits} credits remaining.`);
+        toast.success(
+          `Video generation started! ${data.creditsDeducted} credits deducted. ${data.remainingCredits} credits remaining.`
+        );
       } else {
         toast.error("Error occurred during video generation.");
         console.error("Error occurred during video generation.");
@@ -380,7 +386,10 @@ const VideoGenerationModal = ({ userId, openModal = false, onModalClose }: Props
                             title="Auto-generate video prompt"
                           >
                             {isPrompting ? (
-                              <Loader size={14} className="animate-spin" />
+                              <Loader2
+                                size={14}
+                                className="animate-spin text-primary"
+                              />
                             ) : (
                               <Sparkles size={16} />
                             )}
@@ -399,7 +408,10 @@ const VideoGenerationModal = ({ userId, openModal = false, onModalClose }: Props
                             title="Improve current video prompt"
                           >
                             {isPrompting ? (
-                              <Loader size={14} className="animate-spin" />
+                              <Loader2
+                                size={14}
+                                className="animate-spin text-primary"
+                              />
                             ) : (
                               <Wand2 size={16} />
                             )}
@@ -543,7 +555,10 @@ const VideoGenerationModal = ({ userId, openModal = false, onModalClose }: Props
               >
                 {isProcessing || form.formState.isSubmitting ? (
                   <>
-                    <Loader size={14} className="animate-spin mr-2" />
+                    <Loader2
+                      size={14}
+                      className="animate-spin text-primary mr-2"
+                    />
                     Generating Video
                   </>
                 ) : !canAfford("VIDEO_GENERATION") ? (

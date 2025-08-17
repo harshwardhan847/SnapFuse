@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Download, Loader, Play, Pause } from "lucide-react";
+import { Download, Loader, Play, Pause, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -81,7 +81,7 @@ const VideoList = ({ userId }: Props) => {
   if (status === "LoadingFirstPage") {
     return (
       <div className="flex justify-center py-20">
-        <Loader className="animate-spin" />
+        <Loader2 className="animate-spin text-primary" />
       </div>
     );
   }
@@ -228,7 +228,7 @@ const VideoList = ({ userId }: Props) => {
           >
             {status === "LoadingMore" ? (
               <>
-                <Loader className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" />
                 Loading...
               </>
             ) : (

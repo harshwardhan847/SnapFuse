@@ -18,7 +18,7 @@ import z from "zod";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, ExternalLink, Loader, Info } from "lucide-react";
+import { Download, ExternalLink, Loader, Info, Loader2 } from "lucide-react";
 import Image from "next/image";
 import {
   Dialog,
@@ -63,7 +63,7 @@ const ImagePart = ({ storageId }: { storageId: string }) => {
       <div className="flex flex-col gap-2">
         <div className="relative max-w-md">
           <div className="w-96 h-64 bg-muted/30 rounded-lg flex items-center justify-center">
-            <Loader className="h-6 w-6 animate-spin" />
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         </div>
       </div>
@@ -168,7 +168,9 @@ const ProductImageGenerationPart = ({ part }: { part: any }) => {
       <div className="p-4 bg-muted/50 rounded-lg">
         <div className="flex items-center gap-2 mb-3">
           <Badge variant="outline">Product Image Generation</Badge>
-          {derivedProcessing && <Loader className="h-4 w-4 animate-spin" />}
+          {derivedProcessing && (
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          )}
         </div>
 
         <div className="flex gap-4">
@@ -188,12 +190,12 @@ const ProductImageGenerationPart = ({ part }: { part: any }) => {
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">
-                    <Loader className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   </div>
                 )}
                 {derivedProcessing && (
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                    <Loader className="h-6 w-6 animate-spin text-white" />
+                    <Loader2 className="h-6 w-6 animate-spin text-primary text-white" />
                   </div>
                 )}
               </div>
@@ -232,7 +234,7 @@ const ProductImageGenerationPart = ({ part }: { part: any }) => {
                 </>
               ) : derivedProcessing ? (
                 <div className="flex flex-col items-center gap-2">
-                  <Loader className="h-6 w-6 animate-spin" />
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
                   <span className="text-xs text-muted-foreground">
                     Generating...
                   </span>
@@ -321,7 +323,7 @@ const ProductImageGenerationPart = ({ part }: { part: any }) => {
                     />
                   ) : (
                     <div className="bg-muted/30 rounded-lg h-64 flex items-center justify-center">
-                      <Loader className="h-6 w-6 animate-spin" />
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
                     </div>
                   )}
                 </div>
@@ -443,7 +445,9 @@ const PromptFromImageToolPart = ({ part }: { part: any }) => {
       <div className="p-4 bg-muted/50 rounded-lg">
         <div className="flex items-center gap-2 mb-3">
           <Badge variant="outline">Prompt from Image</Badge>
-          {isProcessing && <Loader className="h-4 w-4 animate-spin" />}
+          {isProcessing && (
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          )}
         </div>
 
         <div className="flex gap-4">
@@ -463,12 +467,12 @@ const PromptFromImageToolPart = ({ part }: { part: any }) => {
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">
-                    <Loader className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   </div>
                 )}
                 {isProcessing && (
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                    <Loader className="h-6 w-6 animate-spin text-white" />
+                    <Loader2 className="h-6 w-6 animate-spin text-primary text-white" />
                   </div>
                 )}
               </div>
@@ -543,7 +547,7 @@ const PromptFromImageToolPart = ({ part }: { part: any }) => {
                     />
                   ) : (
                     <div className="bg-muted/30 rounded-lg h-64 flex items-center justify-center">
-                      <Loader className="h-6 w-6 animate-spin" />
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
                     </div>
                   )}
                 </div>
@@ -632,7 +636,9 @@ const PromptFromImageForVideoToolPart = ({ part }: { part: any }) => {
       <div className="p-4 bg-muted/50 rounded-lg">
         <div className="flex items-center gap-2 mb-3">
           <Badge variant="outline">Prompt from Image</Badge>
-          {isProcessing && <Loader className="h-4 w-4 animate-spin" />}
+          {isProcessing && (
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          )}
         </div>
 
         <div className="flex gap-4">
@@ -652,12 +658,12 @@ const PromptFromImageForVideoToolPart = ({ part }: { part: any }) => {
                   />
                 ) : (
                   <div className="w-full h-full bg-muted/30 flex items-center justify-center">
-                    <Loader className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   </div>
                 )}
                 {isProcessing && (
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                    <Loader className="h-6 w-6 animate-spin text-white" />
+                    <Loader2 className="h-6 w-6 animate-spin text-primary text-white" />
                   </div>
                 )}
               </div>
@@ -732,7 +738,7 @@ const PromptFromImageForVideoToolPart = ({ part }: { part: any }) => {
                     />
                   ) : (
                     <div className="bg-muted/30 rounded-lg h-64 flex items-center justify-center">
-                      <Loader className="h-6 w-6 animate-spin" />
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
                     </div>
                   )}
                 </div>
@@ -1008,7 +1014,7 @@ const MessagesList = ({
         <div className="flex justify-center py-4">
           {isLoadingMore ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
               Loading older messages...
             </div>
           ) : canLoadMore ? (

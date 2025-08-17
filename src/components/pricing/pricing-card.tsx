@@ -1,11 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Loader2 } from 'lucide-react';
-import { useUser } from '@clerk/nextjs';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Check, Loader2 } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 interface PricingCardProps {
   plan: {
@@ -22,16 +29,20 @@ interface PricingCardProps {
   onSubscribe?: (planId: string) => Promise<void>;
 }
 
-export function PricingCard({ plan, currentPlan, onSubscribe }: PricingCardProps) {
+export function PricingCard({
+  plan,
+  currentPlan,
+  onSubscribe,
+}: PricingCardProps) {
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
 
   const isCurrentPlan = currentPlan === plan.id;
-  const isFree = plan.id === 'free';
+  const isFree = plan.id === "free";
 
   const handleSubscribe = async () => {
     if (!user) {
-      toast.error('Please sign in to subscribe');
+      toast.error("Please sign in to subscribe");
       return;
     }
 
@@ -43,15 +54,17 @@ export function PricingCard({ plan, currentPlan, onSubscribe }: PricingCardProps
         await onSubscribe(plan.id);
       }
     } catch (error) {
-      console.error('Subscription error:', error);
-      toast.error('Failed to start subscription');
+      console.error("Subscription error:", error);
+      toast.error("Failed to start subscription");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card className={`relative ${plan.popular ? 'border-primary shadow-lg scale-105' : ''}`}>
+    <Card
+      className={`relative ${plan.popular ? "border-primary shadow-lg scale-105" : ""}`}
+    >
       {plan.popular && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
           <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
@@ -86,12 +99,20 @@ export function PricingCard({ plan, currentPlan, onSubscribe }: PricingCardProps
       <CardFooter>
         <Button
           className="w-full"
-          variant={plan.popular ? 'default' : 'outline'}
+          variant={plan.popular ? "default" : "outline"}
           onClick={handleSubscribe}
-          disabled={loading || isCurrentPlan || (isFree && currentPlan === 'free')}
+          disabled={
+            loading || isCurrentPlan || (isFree && currentPlan === "free")
+          }
         >
-          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isCurrentPlan ? 'Current Plan' : isFree ? 'Get Started' : 'Subscribe'}
+          {loading && (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" />
+          )}
+          {isCurrentPlan
+            ? "Current Plan"
+            : isFree
+              ? "Get Started"
+              : "Subscribe"}
         </Button>
       </CardFooter>
     </Card>

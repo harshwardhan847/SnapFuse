@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader, Wand2, Sparkles, Zap } from "lucide-react";
+import { Loader, Wand2, Sparkles, Zap, Loader2 } from "lucide-react";
 import { useCredits } from "@/hooks/use-credits";
 import { InsufficientCreditsModal } from "@/components/credits/insufficient-credits-modal";
 import { Button } from "@/components/ui/button";
@@ -95,7 +95,9 @@ const ImageGenerationModal = ({ userId }: Props) => {
       }
 
       if (data.status === "processing") {
-        toast.success(`Image generation started! ${data.creditsDeducted} credit deducted. ${data.remainingCredits} credits remaining.`);
+        toast.success(
+          `Image generation started! ${data.creditsDeducted} credit deducted. ${data.remainingCredits} credits remaining.`
+        );
       } else {
         toast.error("Error occurred during generation.");
         console.error("Error occurred during generation.");
@@ -322,7 +324,10 @@ const ImageGenerationModal = ({ userId }: Props) => {
                             title="Auto-generate prompt"
                           >
                             {isPrompting ? (
-                              <Loader size={14} className="animate-spin" />
+                              <Loader2
+                                size={14}
+                                className="animate-spin text-primary"
+                              />
                             ) : (
                               <Sparkles size={16} />
                             )}
@@ -341,7 +346,10 @@ const ImageGenerationModal = ({ userId }: Props) => {
                             title="Improve current prompt"
                           >
                             {isPrompting ? (
-                              <Loader size={14} className="animate-spin" />
+                              <Loader2
+                                size={14}
+                                className="animate-spin text-primary"
+                              />
                             ) : (
                               <Wand2 size={16} />
                             )}
@@ -456,7 +464,10 @@ const ImageGenerationModal = ({ userId }: Props) => {
               >
                 {isProcessing || form.formState.isSubmitting ? (
                   <>
-                    <Loader size={14} className="animate-spin mr-2" />
+                    <Loader2
+                      size={14}
+                      className="animate-spin text-primary mr-2"
+                    />
                     Generating
                   </>
                 ) : !canAfford("IMAGE_GENERATION") ? (

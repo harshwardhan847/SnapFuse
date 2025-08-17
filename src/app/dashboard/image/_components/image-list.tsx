@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Download, Loader, Video } from "lucide-react";
+import { Download, Loader, Loader2, Video } from "lucide-react";
 import { usePlan } from "@/hooks/use-plan";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -107,7 +107,7 @@ const ImageList = ({ userId }: Props) => {
   if (status === "LoadingFirstPage") {
     return (
       <div className="flex justify-center py-20">
-        <Loader className="animate-spin" />
+        <Loader2 className="animate-spin text-primary" />
       </div>
     );
   }
@@ -245,7 +245,7 @@ const ImageList = ({ userId }: Props) => {
           >
             {status === "LoadingMore" ? (
               <>
-                <Loader className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" />
                 Loading...
               </>
             ) : (
@@ -363,7 +363,7 @@ const ImageList = ({ userId }: Props) => {
                           await navigator.clipboard.writeText(
                             selectedImage.prompt || ""
                           );
-                        } catch { }
+                        } catch {}
                       }}
                     >
                       Copy Prompt

@@ -160,7 +160,7 @@ export default function ContactUs() {
                   >
                     {isSubmitting ? (
                       <span className="flex items-center justify-center">
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" />
                         Sending...
                       </span>
                     ) : isSubmitted ? (

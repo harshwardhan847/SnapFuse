@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader } from "lucide-react";
+import { Loader, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -122,7 +122,10 @@ export function RenameChatModal({ chat }: { chat: Doc<"chats"> }) {
                 <Button disabled={form.formState.isSubmitting} type="submit">
                   {form?.formState?.isSubmitting ? (
                     <>
-                      <Loader size={12} className="animate-spin inline mr-2" />
+                      <Loader2
+                        size={12}
+                        className="animate-spin text-primary inline mr-2"
+                      />
                       Renaming
                     </>
                   ) : (

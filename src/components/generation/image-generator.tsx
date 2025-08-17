@@ -62,9 +62,10 @@ export function ImageGenerator() {
         throw new Error(data.error || "Failed to generate image");
       }
 
-      toast.success(`Image generation started! ${data.creditsDeducted} credit deducted. ${data.remainingCredits} credits remaining.`);
+      toast.success(
+        `Image generation started! ${data.creditsDeducted} credit deducted. ${data.remainingCredits} credits remaining.`
+      );
       setPrompt("");
-
     } catch (error: any) {
       console.error("Image generation error:", error);
       if (error.message.includes("Insufficient credits")) {
@@ -110,7 +111,9 @@ export function ImageGenerator() {
                 disabled={loading || !prompt.trim()}
                 className="min-w-[120px]"
               >
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {loading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" />
+                )}
                 Generate Image
               </Button>
             </div>
