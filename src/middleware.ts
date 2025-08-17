@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+// Define route matchers for easy route identification
 const isPublicRoute = createRouteMatcher(["/"]);
 const isApiRoute = createRouteMatcher(["/api(.*)"]);
 const isOnboardingRoute = createRouteMatcher(["/onboarding"]);
@@ -13,40 +14,57 @@ const isProtectedRoute = createRouteMatcher([
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
-  console.log(userId, req.url);
 
+  // Log for debugging
+  console.log("UserId:", userId, "| URL:", req.url);
+
+  // 1. Public home route: redirect authenticated users to dashboard
   if (isPublicRoute(req)) {
     if (userId) {
-      // Redirect authenticated users from home page to dashboard
-      // Onboarding check will be handled client-side in the dashboard layout
+      // Redirect logged-in users from home page to dashboard
       return NextResponse.redirect(new URL("/dashboard/home", req.url));
     }
-    return;
+    // Unauthenticated users allowed on home
+    return NextResponse.next();
   }
 
-  if (!userId && isApiRoute(req)) {
-    return;
+  // 2. Allow API calls from unauthenticated users (public API endpoints)
+  if (isApiRoute(req) && !userId) {
+    return NextResponse.next();
   }
 
+  // 3. Authenticated user flows
   if (userId) {
+    // Protect authenticated routes (throws if not authorized)
     await auth.protect();
 
-    // Allow access to onboarding route
+    // Allow onboarding route to all authenticated users
     if (isOnboardingRoute(req)) {
-      return;
+      return NextResponse.next();
     }
 
-    // For dashboard routes, we'll handle onboarding check client-side
-    // since middleware can't easily access Convex data
+    // Allow protected routes (dashboard, success, etc.)
+    if (isProtectedRoute(req)) {
+      return NextResponse.next();
+    }
 
-  } else if (isProtectedRoute(req)) {
+    // Fallback: deny access to unknown routes for authenticated users
+    return NextResponse.redirect(new URL("/dashboard/home", req.url));
+  }
+
+  // 4. Unauthenticated user trying to access protected route: redirect home
+  if (isProtectedRoute(req)) {
     return NextResponse.redirect(new URL("/", req.url));
   }
+
+  // 5. Default: allow through for non-protected/non-public/non-api requests
+  return NextResponse.next();
 });
 
+// Matcher config ensures middleware runs for all relevant routes
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
+    // Ignore Next.js internals & static files (unless in search params)
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     // Always run for API routes
     "/(api|trpc)(.*)",
