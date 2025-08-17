@@ -16,7 +16,6 @@ export const SUBSCRIPTION_PLANS = {
     priceId: null, // No Stripe price ID for free plan
     credits: 5,
     features: [
-      "10 credits",
       "SEO content generation",
       "Basic image generation",
       "Community support",
@@ -32,7 +31,6 @@ export const SUBSCRIPTION_PLANS = {
     priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID!,
     credits: 40,
     features: [
-      "40 credits per month",
       "SEO content generation",
       "High-quality image generation",
       "High-quality video generation",
@@ -49,15 +47,7 @@ export const SUBSCRIPTION_PLANS = {
     price: 59.99,
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!,
     credits: 200,
-    features: [
-      "200 credits per month",
-      "SEO content generation",
-      "AI Agent Support",
-      "High-quality image generation",
-      "High-quality video generation",
-      "Priority support",
-      "Credit top-ups available",
-    ],
+    features: ["Everything in Starter", "High-quality video generation"],
     popular: true,
     highlighted: false,
   },
@@ -69,13 +59,10 @@ export const SUBSCRIPTION_PLANS = {
     priceId: process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID!,
     credits: 500,
     features: [
-      "500 credits per month",
-      "Unlimited image generation quality",
-      "Unlimited video generation quality",
       "All advanced features",
+      "AI Agent Support",
       "Dedicated support",
       "Custom integrations",
-      "Credit top-ups available",
     ],
     popular: false,
     highlighted: true,
