@@ -102,11 +102,11 @@ export default function Header2() {
                 <div className="relative"></div>
                 <div className="flex flex-col">
                   <Image
-                    src={"/logos/logo_black.jpeg"}
+                    src={"/logos/logo.svg"}
                     alt="Logo"
                     width={100}
                     height={100}
-                    className="object-cover invert "
+                    className="object-contain opacity-95 "
                   />
                   <span className="text-muted-foreground sr-only -mt-1 text-xs">
                     Unleash Product Brilliance

@@ -26,21 +26,19 @@ export default function FooterGlow() {
           align-items: center !important;
         }
       `}</style>
-      <div className="text-foreground relative z-10 mt-10 text-center text-xs mb-12">
-        <span>&copy; 2025 SnapFuse. All rights reserved.</span>
-      </div>
+
       {/* <div className="pointer-events-none absolute top-0 left-1/2 z-0 h-full w-full -translate-x-1/2 select-none">
         <div className="absolute -top-32 left-1/4 h-72 w-72 rounded-full bg-rose-600/20 blur-3xl"></div>
         <div className="absolute right-1/4 -bottom-24 h-80 w-80 rounded-full bg-rose-600/20 blur-3xl"></div>
       </div> */}
       {image ? (
-        <div className="w-full max-h-[70vh] flex items-center justify-center mb-12">
-          <div className=" h-[70%] w-full invert overflow-hidden mask-t-from-75% mask-t-to-20%  mask-b-from-80% mask-b-to-30% mix-blend-multiply ">
+        <div className="w-full  flex items-center justify-center mb-12">
+          <div className=" w-full">
             <Image
-              src={"/logos/logo_black.jpeg"}
+              src={"/logos/logo.svg"}
               width={500}
               height={500}
-              className="object-cover object-top w-full h-min"
+              className="object-contain opacity-95 object-top w-full h-min"
               alt="SnapFuse"
             />
           </div>
@@ -51,7 +49,7 @@ export default function FooterGlow() {
             <a href="#" className="mb-4 flex items-center gap-2">
               <span className="flex h-9 w-9 items-center overflow-hidden justify-center rounded-full bg-gradient-to-br from-rose-400 to-rose-700 text-2xl font-extrabold text-white shadow-md">
                 <Image
-                  src={"/logos/short_logo_bg.jpeg"}
+                  src={"/logos/short_logo.svg"}
                   width={50}
                   height={50}
                   alt="Logo"
@@ -192,6 +190,9 @@ export default function FooterGlow() {
           </nav>
         </div>
       )}
+      <div className="text-foreground relative z-10 mt-10 text-center text-xs mb-12">
+        <span>&copy; 2025 SnapFuse. All rights reserved.</span>
+      </div>
     </footer>
   );
 }

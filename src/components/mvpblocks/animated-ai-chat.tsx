@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import * as React from "react";
+import Image from "next/image";
 
 interface UseAutoResizeTextareaProps {
   minHeight: number;
@@ -502,7 +503,9 @@ export default function AnimatedAIChatInput({
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                       >
-                        <img
+                        <Image
+                          width={200}
+                          height={200}
                           src={attachment.url}
                           alt="attachment"
                           className="h-10 w-10 rounded object-cover"

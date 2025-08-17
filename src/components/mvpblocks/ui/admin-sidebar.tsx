@@ -44,6 +44,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCredits } from "@/hooks/use-credits";
 import { usePlan } from "@/hooks/use-plan";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 const menuItems = [
   {
@@ -107,10 +108,26 @@ export const AdminSidebar = memo(() => {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/dashboard/home">
-                <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <LayoutDashboard className="h-5 w-5" />
+              <Link
+                href="/dashboard/home"
+                className="flex items-center justify-start"
+              >
+                <div className="bg-primary overflow-hidden text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <Image
+                    src={"/logos/short_logo_bg.jpeg"}
+                    alt="Logo"
+                    width={50}
+                    height={50}
+                    className="object-contain "
+                  />
                 </div>
+                <Image
+                  src={"/logos/logo.svg"}
+                  alt="Logo"
+                  width={80}
+                  height={80}
+                  className="object-contain opacity-95 mt-2 "
+                />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
