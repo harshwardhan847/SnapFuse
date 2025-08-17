@@ -28,6 +28,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { Doc } from "../../../../../convex/_generated/dataModel";
+import convex from "@/convex";
 
 type Props = {
   userId: string;

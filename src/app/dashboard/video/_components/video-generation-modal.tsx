@@ -135,6 +135,7 @@ const VideoGenerationModal = ({
           prompt,
           userId,
           inputStorageId,
+          imageUrl,
           duration,
           negative_prompt: negativePrompt,
           cfg_scale: cfgScale,
