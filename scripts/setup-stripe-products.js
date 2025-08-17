@@ -17,22 +17,22 @@ const SUBSCRIPTION_PLANS = [
     id: "starter",
     name: "Starter Plan",
     description: "Perfect for individuals getting started",
-    price: 999, // $9.99 in cents
-    credits: 100,
+    price: 1999, // $19.99 in cents
+    credits: 40,
   },
   {
     id: "pro",
     name: "Pro Plan",
     description: "Great for professionals and creators",
-    price: 1999, // $19.99 in cents
-    credits: 250,
+    price: 5999, // $59.99 in cents
+    credits: 200,
   },
   {
     id: "enterprise",
     name: "Enterprise Plan",
     description: "For teams and businesses",
-    price: 4999, // $49.99 in cents
-    credits: 750,
+    price: 14_999, // $149.99 in cents
+    credits: 500,
   },
 ];
 
