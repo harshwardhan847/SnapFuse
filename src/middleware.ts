@@ -49,7 +49,10 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     // Fallback: deny access to unknown routes for authenticated users
-    return NextResponse.redirect(new URL("/dashboard/home", req.url));
+    if (isPublicRoute(req)) {
+      return NextResponse.redirect(new URL("/dashboard/home", req.url));
+    }
+    return NextResponse.next();
   }
 
   // 4. Unauthenticated user trying to access protected route: redirect home
