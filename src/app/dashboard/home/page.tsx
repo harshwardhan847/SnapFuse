@@ -2,19 +2,10 @@
 
 import { useUser } from "@clerk/nextjs";
 import { CreditsDashboard } from "@/components/dashboard/credits-dashboard";
-import { ImageGenerator } from "@/components/generation/image-generator";
-import { VideoGenerator } from "@/components/generation/video-generator";
-import { SubscriptionStatus } from "@/components/subscription/subscription-status";
 import { NewUserWelcome } from "@/components/onboarding/new-user-welcome";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Image, Video, BarChart3, Settings } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+
 import { Suspense } from "react";
 
 function DashboardSkeleton() {

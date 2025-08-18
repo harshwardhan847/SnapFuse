@@ -132,6 +132,7 @@ export default defineSchema({
     prompt: v.string(),
     video_url: v.union(v.null(), v.string()),
     input_storage_id: v.union(v.id("_storage"), v.null()),
+    imageUrl: v.optional(v.string()),
     duration: v.optional(v.string()),
     negative_prompt: v.optional(v.string()),
     cfg_scale: v.optional(v.number()),

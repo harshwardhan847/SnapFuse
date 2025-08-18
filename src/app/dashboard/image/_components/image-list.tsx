@@ -95,7 +95,6 @@ const ImageList = ({ userId }: Props) => {
     // Store image data in sessionStorage to pass to video generation
     const imageData = {
       imageUrl: image.image_url,
-      storageId: image.input_storage_id,
       prompt: image.prompt,
     };
 

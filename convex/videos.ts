@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { CREDIT_COSTS } from "@/config/pricing";
 
 export const createVideoJobRecord = mutation({
   args: {
@@ -11,6 +12,7 @@ export const createVideoJobRecord = mutation({
     duration: v.optional(v.string()),
     negative_prompt: v.optional(v.string()),
     cfg_scale: v.optional(v.number()),
+    imageUrl: v.optional(v.string()),
   },
   handler: async (
     ctx,
@@ -22,6 +24,7 @@ export const createVideoJobRecord = mutation({
       duration,
       negative_prompt,
       cfg_scale,
+      imageUrl,
     }
   ) => {
     // Check if user has sufficient credits (5 credits for video generation)
@@ -35,14 +38,14 @@ export const createVideoJobRecord = mutation({
     }
 
     const currentCredits = user.credits || 0;
-    if (currentCredits < 5) {
+    if (currentCredits < CREDIT_COSTS.VIDEO_GENERATION) {
       throw new Error("Insufficient credits for video generation");
     }
 
     // Deduct credits first
     await ctx.scheduler.runAfter(0, internal.payments.deductCreditsInternal, {
       userId,
-      amount: 5,
+      amount: CREDIT_COSTS.VIDEO_GENERATION,
       reason: "video_generation",
       relatedId: request_id,
     });
@@ -54,6 +57,7 @@ export const createVideoJobRecord = mutation({
       prompt,
       video_url: null,
       input_storage_id,
+      imageUrl,
       duration,
       negative_prompt,
       cfg_scale,

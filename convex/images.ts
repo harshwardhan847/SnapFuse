@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { CREDIT_COSTS } from "@/config/pricing";
 
 export const createImageJobRecord = mutation({
   args: {
@@ -32,7 +33,7 @@ export const createImageJobRecord = mutation({
     // Deduct credits first
     await ctx.scheduler.runAfter(0, internal.payments.deductCreditsInternal, {
       userId,
-      amount: 1,
+      amount: CREDIT_COSTS.IMAGE_GENERATION,
       reason: "image_generation",
       relatedId: request_id,
     });

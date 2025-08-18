@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader, Wand2, Sparkles, Video, Zap, Loader2 } from "lucide-react";
+import { Loader, Wand2, Sparkles, Video, Zap } from "lucide-react";
 import { useCredits } from "@/hooks/use-credits";
 import { InsufficientCreditsModal } from "@/components/credits/insufficient-credits-modal";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import convex from "@/convex";
+import { api } from "../../../../../convex";
 
 type Props = {
   userId: string;
@@ -91,10 +93,6 @@ const VideoGenerationModal = ({
           if (imageData.imageUrl) {
             form.setValue("imageUrl", imageData.imageUrl);
             setPreviewUrl(imageData.imageUrl);
-          }
-
-          if (imageData.storageId) {
-            setInputStorageId(imageData.storageId);
           }
 
           if (imageData.prompt) {
@@ -387,10 +385,7 @@ const VideoGenerationModal = ({
                             title="Auto-generate video prompt"
                           >
                             {isPrompting ? (
-                              <Loader2
-                                size={14}
-                                className="animate-spin text-primary"
-                              />
+                              <Loader size={14} className="animate-spin" />
                             ) : (
                               <Sparkles size={16} />
                             )}
@@ -409,10 +404,7 @@ const VideoGenerationModal = ({
                             title="Improve current video prompt"
                           >
                             {isPrompting ? (
-                              <Loader2
-                                size={14}
-                                className="animate-spin text-primary"
-                              />
+                              <Loader size={14} className="animate-spin" />
                             ) : (
                               <Wand2 size={16} />
                             )}
@@ -556,10 +548,7 @@ const VideoGenerationModal = ({
               >
                 {isProcessing || form.formState.isSubmitting ? (
                   <>
-                    <Loader2
-                      size={14}
-                      className="animate-spin text-primary mr-2"
-                    />
+                    <Loader size={14} className="animate-spin mr-2" />
                     Generating Video
                   </>
                 ) : !canAfford("VIDEO_GENERATION") ? (

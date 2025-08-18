@@ -246,11 +246,12 @@ const VideoList = ({ userId }: Props) => {
                 <div className="flex flex-col gap-2">
                   <Label>Input Image</Label>
                   <div className="flex items-center justify-center bg-muted/40 rounded-md max-h-[70vh] overflow-auto p-2">
-                    {selectedVideo?.input_storage_id && inputImageUrl ? (
+                    {(selectedVideo?.input_storage_id && inputImageUrl) ||
+                    selectedVideo.imageUrl ? (
                       <Image
                         width={500}
                         height={500}
-                        src={inputImageUrl}
+                        src={inputImageUrl ?? selectedVideo.imageUrl}
                         alt="Input image"
                         className="max-h-[68vh] w-auto object-contain rounded"
                       />

@@ -324,10 +324,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
                             title="Auto-generate prompt"
                           >
                             {isPrompting ? (
-                              <Loader2
-                                size={14}
-                                className="animate-spin text-primary"
-                              />
+                              <Loader size={14} className="animate-spin" />
                             ) : (
                               <Sparkles size={16} />
                             )}
@@ -346,10 +343,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
                             title="Improve current prompt"
                           >
                             {isPrompting ? (
-                              <Loader2
-                                size={14}
-                                className="animate-spin text-primary"
-                              />
+                              <Loader size={14} className="animate-spin" />
                             ) : (
                               <Wand2 size={16} />
                             )}
@@ -464,10 +458,7 @@ const ImageGenerationModal = ({ userId }: Props) => {
               >
                 {isProcessing || form.formState.isSubmitting ? (
                   <>
-                    <Loader2
-                      size={14}
-                      className="animate-spin text-primary mr-2"
-                    />
+                    <Loader2 size={14} className="animate-spin mr-2" />
                     Generating
                   </>
                 ) : !canAfford("IMAGE_GENERATION") ? (

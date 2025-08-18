@@ -4,6 +4,7 @@ import falConfig from "@/fal";
 
 import { api } from "../../../../convex/_generated/api";
 import convex from "@/convex";
+import { CREDIT_COSTS } from "@/config/pricing";
 
 falConfig();
 
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
     // Check if user has sufficient credits before proceeding
     const userCredits = await convex.query(api.payments.checkCredits, {
       userId,
-      requiredCredits: 1, // 1 credit for image generation
+      requiredCredits: CREDIT_COSTS.IMAGE_GENERATION, // 1 credit for image generation
     });
 
     if (!userCredits.hasCredits) {
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
         {
           error: "Insufficient credits",
           currentCredits: userCredits.currentCredits,
-          requiredCredits: 1,
+          requiredCredits: CREDIT_COSTS.IMAGE_GENERATION,
         },
         { status: 402 } // Payment Required
       );
@@ -71,8 +72,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       status: "processing",
       requestId: request_id,
-      creditsDeducted: 1,
-      remainingCredits: userCredits.currentCredits - 1,
+      creditsDeducted: CREDIT_COSTS.IMAGE_GENERATION,
+      remainingCredits:
+        userCredits.currentCredits - CREDIT_COSTS.IMAGE_GENERATION,
     });
   } catch (error: any) {
     console.error("Image generation error:", error);

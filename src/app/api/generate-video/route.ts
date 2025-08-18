@@ -4,6 +4,8 @@ import falConfig from "@/fal";
 
 import { api } from "../../../../convex/_generated/api";
 import convex from "@/convex";
+import { CREDIT_COSTS } from "@/config/pricing";
+import { randomUUID } from "crypto";
 
 falConfig();
 
@@ -11,6 +13,7 @@ export async function POST(request: NextRequest) {
   try {
     const {
       inputStorageId,
+      imageUrl,
       prompt,
       userId,
       duration = "5",
@@ -25,7 +28,7 @@ export async function POST(request: NextRequest) {
     // Check if user has sufficient credits before proceeding
     const userCredits = await convex.query(api.payments.checkCredits, {
       userId,
-      requiredCredits: 5, // 5 credits for video generation
+      requiredCredits: CREDIT_COSTS.VIDEO_GENERATION, // 5 credits for video generation
     });
 
     if (!userCredits.hasCredits) {
@@ -33,25 +36,29 @@ export async function POST(request: NextRequest) {
         {
           error: "Insufficient credits",
           currentCredits: userCredits.currentCredits,
-          requiredCredits: 5,
+          requiredCredits: CREDIT_COSTS.VIDEO_GENERATION,
         },
         { status: 402 } // Payment Required
       );
     }
-    if (!inputStorageId) {
-      return NextResponse.json(
-        { error: "Image not provided" },
-        { status: 404 }
-      );
-    }
+    let image_url = null;
+
     // Get the image URL from the storage ID if provided
-    let imageUrl = null;
-    if (inputStorageId) {
-      imageUrl = await convex.query(api.videos.getStorageUrl, {
+    if (imageUrl) {
+      image_url = imageUrl;
+    } else {
+      if (!inputStorageId) {
+        return NextResponse.json(
+          { error: "Image not provided" },
+          { status: 404 }
+        );
+      }
+
+      image_url = await convex.query(api.videos.getStorageUrl, {
         storageId: inputStorageId as any,
       });
 
-      if (!imageUrl) {
+      if (!image_url) {
         return NextResponse.json({ error: "Image not found" }, { status: 404 });
       }
     }
@@ -75,6 +82,7 @@ export async function POST(request: NextRequest) {
     await convex.mutation(api.videos.createVideoJobRecord, {
       prompt,
       request_id,
+      imageUrl,
       input_storage_id: inputStorageId || null,
       userId,
       duration,
@@ -85,8 +93,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       status: "processing",
       requestId: request_id,
-      creditsDeducted: 5,
-      remainingCredits: userCredits.currentCredits - 5,
+      creditsDeducted: CREDIT_COSTS.VIDEO_GENERATION,
+      remainingCredits:
+        userCredits.currentCredits - CREDIT_COSTS.VIDEO_GENERATION,
     });
   } catch (error: any) {
     console.error("Video generation error:", error);
