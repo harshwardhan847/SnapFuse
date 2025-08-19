@@ -79,13 +79,15 @@ const Showcase = (props: Props) => {
                 </div>
                 <div className="w-full border rounded-2xl shadow flex items-center justify-center overflow-hidden">
                   <video
-                    src={item.outputVideo}
                     className=" w-full object-cover rounded"
                     autoPlay
                     loop
                     muted
                     preload="true"
-                  />
+                    poster={item.outputImage}
+                  >
+                    <source src={item.outputVideo} type="video/mp4" />
+                  </video>
                 </div>
               </div>
             </CarouselItem>
