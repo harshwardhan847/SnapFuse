@@ -3,6 +3,7 @@ import React from "react";
 import { ArrowRight, X } from "lucide-react";
 import { useClerk } from "@clerk/nextjs";
 import Link from "next/link";
+import Showcase from "./Showcase";
 
 export default function Hero() {
   const { openSignUp, isSignedIn } = useClerk();
@@ -65,6 +66,7 @@ export default function Hero() {
               </span>
             </div>
           </div>
+          <Showcase />
           <div className="mx-10 mt-32">
             <img
               src="https://i.postimg.cc/0yk8Vz7t/dashboard.webp"
