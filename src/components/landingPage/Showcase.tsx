@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/carousel";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import Autoplay from "embla-carousel-autoplay";
+
 type Props = {};
 
 const items = [
@@ -31,18 +33,25 @@ const items = [
 const Showcase = (props: Props) => {
   return (
     <div className="w-full mt-12">
-      <Carousel opts={{}}>
+      <Carousel
+        opts={{}}
+        plugins={[
+          Autoplay({
+            delay: 6000,
+          }),
+        ]}
+      >
         <CarouselContent>
           {items?.map((item) => (
             <CarouselItem>
               <div className="w-full relative gap-4 grid grid-cols-3 place-items-center ">
                 <ArrowRight
-                  className="text-white text-3xl scale-50 md:scale-100 drop-shadow absolute top-1/2 -translate-y-1/2 left-1/3 -translate-x-2/4 md:-translate-x-1/3"
+                  className="text-white text-3xl scale-50 md:scale-100 drop-shadow-md absolute top-1/2 -translate-y-1/2 left-1/3 -translate-x-2/4 md:-translate-x-2/3"
                   size={120}
                   strokeWidth={1}
                 />
                 <ArrowRight
-                  className="text-white text-3xl scale-50 md:scale-100 drop-shadow absolute top-1/2 -translate-y-1/2 left-2/3 -translate-x-2/4 md:-translate-x-1/3"
+                  className="text-white text-3xl scale-50 md:scale-100 drop-shadow-md absolute top-1/2 -translate-y-1/2 left-2/3 -translate-x-2/4 md:-translate-x-2/3"
                   size={120}
                   strokeWidth={1}
                 />
