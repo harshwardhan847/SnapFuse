@@ -61,6 +61,8 @@ const Showcase = (props: Props) => {
                     alt="Input Image"
                     width={500}
                     height={500}
+                    priority
+                    loading="eager"
                     className="object-cover w-full"
                   />
                 </div>
@@ -70,6 +72,8 @@ const Showcase = (props: Props) => {
                     alt="Output Image"
                     width={500}
                     height={500}
+                    priority
+                    loading="eager"
                     className="object-cover w-full"
                   />
                 </div>
@@ -80,6 +84,7 @@ const Showcase = (props: Props) => {
                     autoPlay
                     loop
                     muted
+                    preload="true"
                   />
                 </div>
               </div>
