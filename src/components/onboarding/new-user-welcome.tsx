@@ -11,16 +11,18 @@ import {
 } from "@/components/ui/card";
 import { Sparkles, ArrowRight, X } from "lucide-react";
 import { useQuery } from "convex/react";
-import { api } from "../../../convex";
+import { api } from "../../../convex/_generated/api";
 
 export function NewUserWelcome() {
   const { user } = useUser();
   const router = useRouter();
   const isOnBoardingCompleted = useQuery(
     api.userPreferences.checkOnboardingStatus,
-    {
-      userId: user?.id,
-    }
+    user?.id
+      ? {
+          userId: user?.id,
+        }
+      : "skip"
   );
   const [isVisible, setIsVisible] = useState(false);
 
@@ -28,7 +30,7 @@ export function NewUserWelcome() {
     if (!isOnBoardingCompleted) {
       setIsVisible(true);
     }
-  }, [user]);
+  }, [user, isOnBoardingCompleted]);
 
   if (!isVisible) return null;
 
@@ -51,7 +53,8 @@ export function NewUserWelcome() {
             <div>
               <CardTitle className="text-lg">Welcome to SnapFuse!</CardTitle>
               <CardDescription>
-                Let's get you set up for success with AI content generation.
+                Let&apos;s get you set up for success with AI content
+                generation.
               </CardDescription>
             </div>
           </div>

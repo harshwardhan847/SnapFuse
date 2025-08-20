@@ -36,13 +36,13 @@ export function useCredits() {
 
   const hasActiveSubscription = isSubscriptionActive(
     userCredits?.subscriptionStatus,
-    userCredits?.subscriptionPeriodEnd
+    userCredits?.subscriptionPeriodEnd ?? undefined
   );
 
   const canAccessFeatures = shouldAllowFeatureAccess(
     userCredits?.subscriptionPlan || "free",
     userCredits?.subscriptionStatus,
-    userCredits?.subscriptionPeriodEnd
+    userCredits?.subscriptionPeriodEnd ?? undefined
   );
 
   return {

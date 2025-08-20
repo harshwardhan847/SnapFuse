@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { CREDIT_COSTS } from "@/config/pricing";
 
 export const createVideoJobRecord = mutation({
@@ -43,7 +43,7 @@ export const createVideoJobRecord = mutation({
     }
 
     // Deduct credits first
-    await ctx.scheduler.runAfter(0, internal.payments.deductCreditsInternal, {
+    await ctx.scheduler.runAfter(0, api.payments.deductCreditsInternal, {
       userId,
       amount: CREDIT_COSTS.VIDEO_GENERATION,
       reason: "video_generation",

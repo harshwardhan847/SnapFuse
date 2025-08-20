@@ -16,7 +16,7 @@ export default defineSchema({
     stripeCustomerId: v.optional(v.string()),
     stripeSubscriptionId: v.optional(v.string()),
     subscriptionStatus: v.optional(v.string()), // active, canceled, past_due, etc.
-    subscriptionPeriodEnd: v.optional(v.number()), // Unix timestamp
+    subscriptionPeriodEnd: v.optional(v.union(v.number(), v.null())), // Unix timestamp
     // Onboarding and preferences
     onboardingCompleted: v.optional(v.boolean()),
     company: v.optional(v.string()),

@@ -39,8 +39,9 @@ export async function POST(req: NextRequest) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-  } catch (error: any) {
-    console.error("Webhook signature verification failed:", error.message);
+  } catch (error) {
+    //@ts-expect-error //expected
+    console.error("Webhook signature verification failed:", error?.message);
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
@@ -80,10 +81,11 @@ export async function POST(req: NextRequest) {
       `Successfully processed webhook event: ${event.type} (${event.id})`
     );
     return NextResponse.json({ received: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error(
       `Error processing webhook event ${event.type} (${event.id}):`,
-      error.message
+      //@ts-expect-error// expected
+      error?.message
     );
     return NextResponse.json(
       { error: "Webhook processing failed" },
@@ -105,9 +107,12 @@ async function handleCheckoutSessionCompleted(
 
   // Check if we've already processed this session to prevent duplicates
   try {
-    const existingPayment = await convex.query(api.payments.getPaymentBySessionId, {
-      sessionId: session.id,
-    });
+    const existingPayment = await convex.query(
+      api.payments.getPaymentBySessionId,
+      {
+        sessionId: session.id,
+      }
+    );
 
     if (existingPayment) {
       console.log(`Payment already processed for session: ${session.id}`);
@@ -120,7 +125,10 @@ async function handleCheckoutSessionCompleted(
   // Record the payment
   await convex.mutation(api.payments.recordPayment, {
     userId,
-    stripePaymentIntentId: typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id || null,
+    stripePaymentIntentId:
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : session.payment_intent?.id || null,
     stripeSessionId: session.id,
     amount: session.amount_total || 0,
     currency: session.currency || "usd",
@@ -238,16 +246,24 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   }
 
   // Skip initial subscription invoices (they're handled by checkout.session.completed)
-  if (invoice.billing_reason === 'subscription_create') {
-    console.log("Skipping initial subscription invoice, handled by checkout session");
+  if (invoice.billing_reason === "subscription_create") {
+    console.log(
+      "Skipping initial subscription invoice, handled by checkout session"
+    );
     return;
   }
 
   try {
     // Check if we've already processed this invoice to prevent duplicates
-    const existingPayment = await convex.query(api.payments.getPaymentByInvoiceId, {
-      invoiceId: invoice.id,
-    });
+    if (!invoice.id) {
+      return;
+    }
+    const existingPayment = await convex.query(
+      api.payments.getPaymentByInvoiceId,
+      {
+        invoiceId: invoice.id,
+      }
+    );
 
     if (existingPayment) {
       console.log(`Invoice already processed: ${invoice.id}`);
@@ -301,7 +317,10 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       // Record the payment
       await convex.mutation(api.payments.recordPayment, {
         userId: user.externalId,
-        stripePaymentIntentId: invoice.payments?.data[0].payment,
+        stripePaymentIntentId:
+          typeof invoice.payments?.data[0].payment.payment_intent === "string"
+            ? invoice.payments?.data[0].payment.payment_intent
+            : invoice.payments?.data[0].payment.payment_intent?.id,
         stripeInvoiceId: invoice.id,
         amount: invoice.amount_paid,
         currency: invoice.currency,

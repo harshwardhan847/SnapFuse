@@ -30,8 +30,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import convex from "@/convex";
-import { api } from "../../../../../convex";
 
 type Props = {
   userId: string;
@@ -158,12 +156,14 @@ const VideoGenerationModal = ({
         toast.error("Error occurred during video generation.");
         console.error("Error occurred during video generation.");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Video generation error:", error);
-      if (error.message?.includes("Insufficient credits")) {
+      //@ts-expect-error //asdf
+      if (error?.message?.includes("Insufficient credits")) {
         setShowInsufficientCredits(true);
       } else {
-        toast.error(error.message || "Failed to generate video");
+        //@ts-expect-error //asdf
+        toast.error(error?.message || "Failed to generate video");
       }
     } finally {
       setIsProcessing(false);

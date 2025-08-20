@@ -43,12 +43,15 @@ export async function POST(request: NextRequest) {
     let imageUrl = null;
     if (inputStorageId) {
       imageUrl = await convex.query(api.images.getStorageUrl, {
-        storageId: inputStorageId as any,
+        storageId: inputStorageId,
       });
 
       if (!imageUrl) {
         return NextResponse.json({ error: "Image not found" }, { status: 404 });
       }
+    }
+    if (!imageUrl) {
+      return NextResponse.json({ error: "Image not found" }, { status: 404 });
     }
 
     // Submit to FAL AI for processing
@@ -76,9 +79,10 @@ export async function POST(request: NextRequest) {
       remainingCredits:
         userCredits.currentCredits - CREDIT_COSTS.IMAGE_GENERATION,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Image generation error:", error);
 
+    //@ts-expect-error //a
     if (error.message?.includes("Insufficient credits")) {
       return NextResponse.json(
         { error: "Insufficient credits" },

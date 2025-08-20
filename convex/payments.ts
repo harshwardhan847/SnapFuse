@@ -119,7 +119,7 @@ export const updateSubscription = mutation({
     stripeCustomerId: v.optional(v.string()),
     stripeSubscriptionId: v.optional(v.string()),
     subscriptionStatus: v.optional(v.string()),
-    subscriptionPeriodEnd: v.optional(v.number()),
+    subscriptionPeriodEnd: v.optional(v.union(v.number(), v.null())),
   },
   handler: async (ctx, args) => {
     const user = await ctx.db
