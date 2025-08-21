@@ -22,6 +22,11 @@ import {
 } from "@/components/ui/card";
 import { Zap, CreditCard } from "lucide-react";
 import { api } from "../../../convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import { Phone, Mail, Calendar, MessageCircle } from "lucide-react";
+import { calendlyLink, email, phoneNumber, whatsappNumber } from "@/constants";
+
+// Change these to your real contact details!
 
 export default function PricingPage() {
   const { user } = useUser();
@@ -100,6 +105,64 @@ export default function PricingPage() {
   const canTopup = canUserTopup(currentPlan);
 
   return (
+    <div className="flex justify-center items-center min-h-screen px-2">
+      <Card className="max-w-md w-full mx-auto p-6 shadow-lg">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold mb-1">
+            Contact Sales
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <p className="text-muted-foreground text-lg text-center">
+            Payments and subscriptions are currently not automated.
+            <br />
+            Please contact us via any of the methods below:
+          </p>
+
+          <div className="flex flex-col gap-3 mt-6">
+            <Button variant="outline" className="gap-2" asChild>
+              <a href={`tel:${phoneNumber}`}>
+                <Phone className="h-5 w-5" /> Call {phoneNumber}
+              </a>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="gap-2"
+              asChild
+              style={{ background: "#25D366", color: "white" }}
+            >
+              <a
+                href={`https://wa.me/${whatsappNumber.replace(/\D/g, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle className="h-5 w-5" /> WhatsApp
+              </a>
+            </Button>
+
+            <Button variant="outline" className="gap-2" asChild>
+              <a href={`mailto:${email}?subject=Pricing%20Enquiry`}>
+                <Mail className="h-5 w-5" /> Email
+              </a>
+            </Button>
+
+            <Button variant="outline" className="gap-2" asChild>
+              <a href={calendlyLink} target="_blank" rel="noopener noreferrer">
+                <Calendar className="h-5 w-5" /> Schedule a Meeting
+              </a>
+            </Button>
+          </div>
+
+          <p className="text-xs text-muted-foreground text-center mt-5">
+            We'll be happy to help you select a plan or answer any questions!
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Choose Your Plan</h1>
@@ -118,7 +181,7 @@ export default function PricingPage() {
             </CardHeader>
             <CardContent className="text-center">
               <div className="text-3xl font-bold text-primary">
-                {userCredits.credits} Credits
+                {userCredits?.credits} Credits
               </div>
               <div className="text-sm text-muted-foreground mt-1">
                 Current Plan:{" "}
