@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { api } from "../../../../../convex/_generated/api";
 import convex from "@/convex";
+import { CREDIT_COSTS } from "@/config/pricing";
 
 export async function POST(request: NextRequest) {
   const data = await request.json();
@@ -65,12 +66,50 @@ export async function POST(request: NextRequest) {
       `Generation failed for request ${requestId}: ${errorDetails}`
     );
 
-    await convex.mutation(api.images.updateImageJobStatus, {
+    const imageJob = await convex.query(api.images.getImageJobByRequestId, {
       request_id: requestId,
-      status: "error",
-      error_message: errorDetails,
-      image_url: null,
     });
+
+    if (imageJob) {
+      await convex.mutation(api.images.updateImageJobStatus, {
+        request_id: requestId,
+        status: "error",
+        error_message: errorDetails,
+        image_url: null,
+      });
+      await convex.mutation(api.payments.addCredits, {
+        amount: CREDIT_COSTS.IMAGE_GENERATION,
+        reason: "Error Refund",
+        userId: imageJob.userId,
+        relatedId: imageJob.request_id,
+      });
+    } else {
+      const videoJob = await convex.query(api.videos.getVideoJobByRequestId, {
+        request_id: requestId,
+      });
+      if (videoJob) {
+        await convex.mutation(api.videos.updateVideoJobStatus, {
+          request_id: requestId,
+          status: "error",
+          error_message: errorDetails,
+          video_url: null,
+        });
+        await convex.mutation(api.payments.addCredits, {
+          amount: CREDIT_COSTS.VIDEO_GENERATION,
+          reason: "Error Refund",
+          userId: videoJob.userId,
+          relatedId: videoJob.request_id,
+        });
+
+        return NextResponse.json({ status: "error_handled" });
+      }
+      await convex.mutation(api.images.updateImageJobStatus, {
+        request_id: requestId,
+        status: "error",
+        error_message: errorDetails,
+        image_url: null,
+      });
+    }
 
     return NextResponse.json({ status: "error_handled" });
   }
