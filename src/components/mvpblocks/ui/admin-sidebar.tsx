@@ -124,9 +124,9 @@ export const AdminSidebar = memo(() => {
                 <Image
                   src={"/logos/logo.svg"}
                   alt="Logo"
-                  width={80}
-                  height={80}
-                  className="object-contain opacity-95 mt-2 "
+                  width={60}
+                  height={60}
+                  className="object-contain invert dark:invert-0 opacity-95 mt-0 py-2 "
                 />
               </Link>
             </SidebarMenuButton>

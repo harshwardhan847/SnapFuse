@@ -5,6 +5,7 @@ import falConfig from "@/fal";
 import { api } from "../../../../convex/_generated/api";
 import convex from "@/convex";
 import { CREDIT_COSTS } from "@/config/pricing";
+import { imageGenModel } from "@/ai/models";
 
 falConfig();
 
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Submit to FAL AI for processing
-    const { request_id } = await fal.queue.submit("fal-ai/flux-kontext/dev", {
+    const { request_id } = await fal.queue.submit(imageGenModel, {
       input: {
         prompt,
         image_url: imageUrl,

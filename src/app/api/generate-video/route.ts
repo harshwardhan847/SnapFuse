@@ -5,7 +5,7 @@ import falConfig from "@/fal";
 import { api } from "../../../../convex/_generated/api";
 import convex from "@/convex";
 import { CREDIT_COSTS } from "@/config/pricing";
-import { randomUUID } from "crypto";
+import { videoGenModel } from "@/ai/models";
 
 falConfig();
 
@@ -64,19 +64,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Submit to FAL AI for processing
-    const { request_id } = await fal.queue.submit(
-      "fal-ai/kling-video/v1.6/standard/image-to-video",
-      {
-        input: {
-          prompt,
-          image_url: imageUrl,
-          duration,
-          negative_prompt,
-          cfg_scale,
-        },
-        webhookUrl: `${process.env.APP_BASE_URL}/api/webhooks/falai`,
-      }
-    );
+    const { request_id } = await fal.queue.submit(videoGenModel, {
+      input: {
+        prompt,
+        image_url: imageUrl,
+        duration,
+        negative_prompt,
+        cfg_scale,
+      },
+      webhookUrl: `${process.env.APP_BASE_URL}/api/webhooks/falai`,
+    });
 
     // Create video job record (this will deduct credits automatically)
     await convex.mutation(api.videos.createVideoJobRecord, {
