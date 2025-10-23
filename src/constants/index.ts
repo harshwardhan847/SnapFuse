@@ -1,5 +1,5 @@
 export const calendlyLink =
-  "https://calendly.com/signaturestudio/snapfuse-siscussion";
+  "https://calendly.com/signaturestudio/justplay-siscussion";
 
 export const phoneNumber = "+91-7988543957";
 export const whatsappNumber = "+917988543957"; // in international format, no + or dashes

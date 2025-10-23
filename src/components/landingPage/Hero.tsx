@@ -28,7 +28,7 @@ export default function Hero() {
             <h2 className="font-geist italic mx-auto bg-[linear-gradient(180deg,_#FFF_0%,_rgba(255,_255,_255,_0.00)_202.08%)] bg-clip-text text-4xl tracking-tighter text-transparent sm:text-6xl md:text-7xl">
               Create, Enhance, and Launch{" "}
               <span className="bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-                Every Listing with <b className="inline">Snapfuse</b>.
+                Every Listing with <b className="inline">justplay</b>.
               </span>
             </h2>
 

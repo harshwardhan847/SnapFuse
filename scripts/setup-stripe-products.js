@@ -75,7 +75,7 @@ async function createStripeProducts() {
     console.log("📦 Creating subscription plans...");
     for (const plan of SUBSCRIPTION_PLANS) {
       const product = await stripe.products.create({
-        id: `snapfuse_${plan.id}`,
+        id: `justplay_${plan.id}`,
         name: plan.name,
         description: `${plan.description} - ${plan.credits} credits per month`,
         metadata: {
@@ -106,7 +106,7 @@ async function createStripeProducts() {
     console.log("\n💰 Creating credit top-up products...");
     for (const topup of TOPUP_OPTIONS) {
       const product = await stripe.products.create({
-        id: `snapfuse_${topup.id}`,
+        id: `justplay_${topup.id}`,
         name: topup.name,
         description: topup.description,
         metadata: {

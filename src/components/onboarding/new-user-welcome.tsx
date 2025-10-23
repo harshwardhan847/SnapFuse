@@ -51,7 +51,7 @@ export function NewUserWelcome() {
               <Sparkles className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-lg">Welcome to SnapFuse!</CardTitle>
+              <CardTitle className="text-lg">Welcome to justplay!</CardTitle>
               <CardDescription>
                 Let&apos;s get you set up for success with AI content
                 generation.
@@ -67,7 +67,7 @@ export function NewUserWelcome() {
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             Complete our quick setup to personalize your experience and get the
-            most out of SnapFuse.
+            most out of justplay.
           </p>
           <Button onClick={handleStartOnboarding} className="ml-4">
             Get Started

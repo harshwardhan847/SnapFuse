@@ -19,7 +19,7 @@ export function Navbar() {
               className="flex items-center gap-2 font-bold text-xl"
             >
               <Zap className="h-6 w-6 text-primary" />
-              SnapFuse
+              justplay
             </Link>
 
             {user && (

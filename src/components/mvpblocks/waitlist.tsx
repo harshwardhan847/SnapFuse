@@ -63,7 +63,7 @@ export default function WaitlistPage() {
           className="border-primary/10 from-primary/15 to-primary/5 mb-8 inline-flex items-center gap-2 rounded-full border bg-gradient-to-r px-4 py-2 backdrop-blur-sm"
         >
           <Sparkles className="spin h-6 w-6" />
-          <span className="text-sm font-medium">SnapFuse</span>
+          <span className="text-sm font-medium">justplay</span>
           <motion.div
             animate={{ x: [0, 5, 0] }}
             transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}

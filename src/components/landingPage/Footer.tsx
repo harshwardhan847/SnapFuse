@@ -32,14 +32,14 @@ export default function FooterGlow() {
         <div className="absolute right-1/4 -bottom-24 h-80 w-80 rounded-full bg-rose-600/20 blur-3xl"></div>
       </div> */}
       {image ? (
-        <div className="w-full  flex items-center justify-center mb-12">
+        <div className="w-full  flex items-center justify-center hidden mb-12">
           <div className=" w-full">
             <Image
               src={"/logos/logo.svg"}
               width={500}
               height={500}
               className="object-contain opacity-95 object-top w-full h-min"
-              alt="SnapFuse"
+              alt="justplay"
             />
           </div>
         </div>
@@ -47,7 +47,7 @@ export default function FooterGlow() {
         <div className="glass relative mx-auto flex max-w-6xl flex-col items-center gap-8 rounded-2xl px-6 py-10 md:flex-row md:items-start md:justify-between md:gap-12">
           <div className="flex flex-col items-center md:items-start">
             <a href="#" className="mb-4 flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center overflow-hidden justify-center rounded-full bg-gradient-to-br from-rose-400 to-rose-700 text-2xl font-extrabold text-white shadow-md">
+              <span className="flex h-9 hidden w-9 items-center overflow-hidden justify-center rounded-full bg-gradient-to-br from-rose-400 to-rose-700 text-2xl font-extrabold text-white shadow-md">
                 <Image
                   src={"/logos/short_logo.svg"}
                   width={50}
@@ -57,7 +57,7 @@ export default function FooterGlow() {
                 />
               </span>
               <span className="bg-gradient-to-br from-rose-200 to-rose-500 bg-clip-text text-xl font-semibold tracking-tight text-transparent">
-                SnapFuse
+                justplay
               </span>
             </a>
             <p className="text-foreground mb-6 max-w-xs text-center text-sm md:text-left">
@@ -191,7 +191,7 @@ export default function FooterGlow() {
         </div>
       )}
       <div className="text-foreground relative z-10 mt-10 text-center text-xs mb-12">
-        <span>&copy; 2025 SnapFuse. All rights reserved.</span>
+        <span>&copy; 2025 justplay. All rights reserved.</span>
       </div>
     </footer>
   );

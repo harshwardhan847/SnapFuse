@@ -164,7 +164,7 @@ export function MultiStepOnboarding({
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">Welcome to SnapFuse</h1>
+            <h1 className="text-2xl font-bold">Welcome to justplay</h1>
             {onSkip && currentStep < steps.length && (
               <Button variant="ghost" onClick={onSkip}>
                 Skip Setup

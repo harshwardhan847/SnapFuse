@@ -120,44 +120,44 @@ function FAQItem({ question, answer, index }: FAQItemProps) {
 export default function Faq() {
   const faqs: Omit<FAQItemProps, "index">[] = [
     {
-      question: "What makes SnapFuse unique?",
+      question: "What makes justplay unique?",
       answer:
-        "SnapFuse sets itself apart by instantly generating high-quality, SEO-optimized product content, AI-powered studio images, and professional videos—all in one platform. Unlike traditional solutions, SnapFuse eliminates the need for separate writers, designers, and video editors, saving you time and cost while dramatically accelerating your eCommerce growth.",
+        "justplay sets itself apart by instantly generating high-quality, SEO-optimized product content, AI-powered studio images, and professional videos—all in one platform. Unlike traditional solutions, justplay eliminates the need for separate writers, designers, and video editors, saving you time and cost while dramatically accelerating your eCommerce growth.",
     },
     {
       question: "How do I customize the AI-generated content?",
       answer:
-        "You have full control over your listing. Simply enter your product details and preferences, and SnapFuse will generate previews for review and edit before finalizing. You can refine titles, images, descriptions, and even select styles for product visuals until you’re completely satisfied with each listing.",
+        "You have full control over your listing. Simply enter your product details and preferences, and justplay will generate previews for review and edit before finalizing. You can refine titles, images, descriptions, and even select styles for product visuals until you’re completely satisfied with each listing.",
     },
     {
-      question: "Does SnapFuse support major eCommerce platforms?",
+      question: "Does justplay support major eCommerce platforms?",
       answer:
-        "Yes, SnapFuse is designed to work seamlessly with leading eCommerce platforms and marketplaces. You can easily copy and download content for direct use on Amazon, Shopify, WooCommerce, Flipkart, and more, with formats optimized for each channel.",
+        "Yes, justplay is designed to work seamlessly with leading eCommerce platforms and marketplaces. You can easily copy and download content for direct use on Amazon, Shopify, WooCommerce, Flipkart, and more, with formats optimized for each channel.",
     },
     {
-      question: "How do I get started with SnapFuse?",
+      question: "How do I get started with justplay?",
       answer:
-        "Just sign up for a free account, add your product details, and let SnapFuse’s AI generate content instantly. From there, review, customize as needed, and publish or export your catalog—no technical skills required.",
+        "Just sign up for a free account, add your product details, and let justplay’s AI generate content instantly. From there, review, customize as needed, and publish or export your catalog—no technical skills required.",
     },
     {
-      question: "Can SnapFuse handle large catalogs or enterprise needs?",
+      question: "Can justplay handle large catalogs or enterprise needs?",
       answer:
-        "Absolutely. SnapFuse scales effortlessly for both small sellers and enterprise brands. Advanced batch processing, team collaboration, and API integration options are available for businesses with large or rapidly growing catalogs.",
+        "Absolutely. justplay scales effortlessly for both small sellers and enterprise brands. Advanced batch processing, team collaboration, and API integration options are available for businesses with large or rapidly growing catalogs.",
     },
     {
-      question: "Is SnapFuse suitable for non-English product listings?",
+      question: "Is justplay suitable for non-English product listings?",
       answer:
-        "SnapFuse currently supports English product generation. We are actively expanding to additional languages and plan to introduce multilingual support soon.",
+        "justplay currently supports English product generation. We are actively expanding to additional languages and plan to introduce multilingual support soon.",
     },
     {
-      question: "How secure is my product data with SnapFuse?",
+      question: "How secure is my product data with justplay?",
       answer:
-        "SnapFuse prioritizes your privacy and security. All product data and images are encrypted and never shared without your consent. Our platform adheres to industry-standard security practices for your peace of mind.",
+        "justplay prioritizes your privacy and security. All product data and images are encrypted and never shared without your consent. Our platform adheres to industry-standard security practices for your peace of mind.",
     },
     {
-      question: "Does SnapFuse offer a free trial?",
+      question: "Does justplay offer a free trial?",
       answer:
-        "Yes! You can start for free with no credit card required. Our free plan gives you immediate access to core features—try SnapFuse risk-free and upgrade anytime to unlock advanced capabilities and higher usage limits.",
+        "Yes! You can start for free with no credit card required. Our free plan gives you immediate access to core features—try justplay risk-free and upgrade anytime to unlock advanced capabilities and higher usage limits.",
     },
   ];
   return (

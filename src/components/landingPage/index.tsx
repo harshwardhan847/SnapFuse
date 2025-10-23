@@ -12,9 +12,7 @@ import FooterGlow from "./Footer";
 import Users from "./Users";
 import { VelocityScroll } from "../mvpblocks/ui/scroll-based-velocity";
 
-type Props = {};
-
-const LandingPage = (props: Props) => {
+const LandingPage = () => {
   return (
     <div className="dark min-h-screen bg-background">
       <Header2 />
@@ -27,7 +25,7 @@ const LandingPage = (props: Props) => {
       </div> */}
       <VelocityScroll
         className="px-6 text-center dark dark:text-white text-4xl font-bold tracking-tight md:text-7xl md:leading-[5rem]"
-        text="Welcome to SnapFuse — AI that empowers your listings."
+        text="Welcome to justplay — AI that empowers your listings."
         default_velocity={3}
       />
       <CTA />

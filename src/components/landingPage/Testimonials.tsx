@@ -249,7 +249,7 @@ export default function Testimonials() {
             real e-commerce owners
           </span>{" "}
           are saying about{" "}
-          <span className="font-semibold text-red-500">SnapFuse</span>
+          <span className="font-semibold text-red-500">justplay</span>
         </h3>
       </motion.div>
 

@@ -11,7 +11,7 @@ export const DashboardHeader = memo(() => {
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-0 h-4" />
         <div className="grid flex-1 text-left text-lg leading-tight">
-          <span className="truncate font-bold">SnapFuse</span>
+          <span className="truncate font-bold">justplay</span>
         </div>
       </div>
 

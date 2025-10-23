@@ -123,7 +123,7 @@ export default function Feature() {
               <span className="absolute inset-0 bg-[radial-gradient(30%_40%_at_50%_100%,hsl(var(--primary)/0.25)_0%,transparent_100%)]"></span>
             </div>
             <h2 className="text-foreground mb-2 text-center text-2xl sm:mb-2.5 md:text-[2rem]">
-              Why Choose SnapFuse?
+              Why Choose justplay?
             </h2>
             <p className="text-muted-foreground mx-auto max-w-[18rem] text-center text-pretty">
               No graphic designer, video editor, or copywriter required.
