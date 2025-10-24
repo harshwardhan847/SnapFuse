@@ -90,7 +90,7 @@ export function PricingCard({
         )}
       </h2>
 
-      <div className="relative h-12">
+      <div className="relative h-12 hidden">
         {typeof plan.price === "number" ? (
           <>
             <NumberFlow
@@ -112,7 +112,7 @@ export function PricingCard({
       <div className="flex-1 space-y-2">
         <h3 className="text-sm font-medium">{plan.description}</h3>
         <div className="mt-4">
-          <span className="text-4xl font-bold">${plan.price}</span>
+          <span className="text-4xl font-bold">₹{plan.price}</span>
           {!isFree && <span className="text-muted-foreground">/month</span>}
         </div>
         <div className="text-sm text-muted-foreground">
@@ -171,7 +171,7 @@ export function PricingCard({
 
   return (
     <Card
-      className={`relative ${plan.popular ? "border-primary shadow-lg scale-105" : ""}`}
+      className={`relative ₹{plan.popular ? "border-primary shadow-lg scale-105" : ""}`}
     >
       {plan.popular && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -185,7 +185,7 @@ export function PricingCard({
         <CardTitle className="text-2xl">{plan.name}</CardTitle>
         <CardDescription>{plan.description}</CardDescription>
         <div className="mt-4">
-          <span className="text-4xl font-bold">${plan.price}</span>
+          <span className="text-4xl font-bold">₹{plan.price}</span>
           {!isFree && <span className="text-muted-foreground">/month</span>}
         </div>
         <div className="text-sm text-muted-foreground">
