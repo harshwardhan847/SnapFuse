@@ -50,10 +50,10 @@ export default function CTA() {
               </a> */}
               <a
                 className="flex items-center text-xs md:text-base gap-2 text-white"
-                href="tel:+91-7988543957"
+                href="tel:+91-9588183730"
               >
                 <Phone className="h-7 w-7 text-green-500" />
-                +91-7988543957
+                +91-9588183730
               </a>
               <div></div>
             </div>

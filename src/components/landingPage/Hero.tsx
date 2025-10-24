@@ -67,7 +67,7 @@ export default function Hero() {
             </div>
           </div>
           <Showcase />
-          <div className="mx-10 mt-32">
+          <div className="mx-10 mt-32 hidden">
             <img
               src="https://i.postimg.cc/0yk8Vz7t/dashboard.webp"
               className="w-full rounded-lg border shadow-lg"
